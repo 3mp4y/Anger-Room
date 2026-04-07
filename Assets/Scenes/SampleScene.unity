@@ -13919,11 +13919,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00c8af97c4dd923448851024a7d6b5ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  solved: 010101
+  solved: 0101010101
   cubes:
   - {fileID: 1189157994}
   - {fileID: 886587495}
   - {fileID: 713417245}
+  - {fileID: 1227166520}
+  - {fileID: 1199105507}
   right: {fileID: 2100000, guid: 1835c6d07f135f9458c14fc449c9ffff, type: 2}
   wrong: {fileID: 2100000, guid: 6792b7ff6c0aa3046884e23db4d7754a, type: 2}
   audioData: {fileID: 2080870043}
