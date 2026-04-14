@@ -7,39 +7,31 @@ public class CountDown : MonoBehaviour
 {
     [SerializeField] TextMeshPro countd;
     [SerializeField] float time_left;
-
     public GameObject it;
-
-    CubesPuzzle puzz;
-
+    public CubesPuzzle puzz;
     bool isPlaying = false;
-
     // Update is called once per frame
     void Update()
     {
+        int minutes = Mathf.FloorToInt(time_left / 60);
+        int seconds = Mathf.FloorToInt(time_left % 60);
         if (isPlaying) {
         if (time_left > 0)
         {
-            it.SetActive(true);
             time_left -= Time.deltaTime;
+            countd.text = string.Format("{0:00}:{1:00}", minutes, seconds);
         }
         else
-        {
-            time_left = 0;
-            
-            it.SetActive(false);
+        {   
             isPlaying = false;
-            //puzz.playSound();
-            //puzz.CleanCubes();
-
+            puzz.playSound();
+            puzz.CleanCubes();
+            countd.text = string.Format("");
         }
-        int minutes = Mathf.FloorToInt(time_left / 60);
-        int seconds = Mathf.FloorToInt(time_left % 60);
-        countd.text = string.Format("{0:00}:{1:00}", minutes, seconds);
     }
     else
         {
-            time_left = 15;
+            time_left = 16;
         }
 
     }

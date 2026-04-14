@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ShootScript : MonoBehaviour
 {
+    public ParticleSystem smoke;
     public LayerMask mask;
     public OVRInput.RawButton shootingButton;
     public LineRenderer lineRend;
@@ -17,6 +18,8 @@ public class ShootScript : MonoBehaviour
     [SerializeField] [Range(0, 100)] public int failureChance; 
     private float timer;
     public float reloadTime = 1;
+
+    private int points = 0;
     public int FailureChance
 {
     get => failureChance;
@@ -46,6 +49,8 @@ public class ShootScript : MonoBehaviour
         if (OVRInput.GetDown(shootingButton) && !reload)
         {
             Shoot();
+            smoke.Play();
+            //smoke.Emit(1000);
         }
     }
 
@@ -66,6 +71,8 @@ public class ShootScript : MonoBehaviour
                 if (Random.Range(0,101) >= failureChance)
                 {
                     target.OnHit();
+                    points++;
+
                 }
                 else
                 {
@@ -86,12 +93,13 @@ public class ShootScript : MonoBehaviour
 
         }
 
-
+        
         LineRenderer line = Instantiate(lineRend);
         line.positionCount = 2;
         line.SetPosition(0, shootingpoiint.position);
         line.SetPosition(1, endPoint);   
         Destroy(line.gameObject, lineTime);
+        
     }
 
 }
