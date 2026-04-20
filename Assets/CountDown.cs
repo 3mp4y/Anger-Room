@@ -7,7 +7,6 @@ public class CountDown : MonoBehaviour
 {
     [SerializeField] TextMeshPro countd;
     [SerializeField] float time_left;
-    public GameObject it;
     public CubesPuzzle puzz;
     bool isPlaying = false;
     // Update is called once per frame
@@ -24,19 +23,15 @@ public class CountDown : MonoBehaviour
         else
         {   
             isPlaying = false;
-            puzz.playSound();
-            puzz.CleanCubes();
+            puzz.PlaySound();
+            puzz.CleanCards();
             countd.text = string.Format("");
         }
     }
-    else
-        {
-            time_left = 16;
-        }
 
     }
 
-    public void SetTimer(int x)
+    public void SetTimer(float x)
     {
         time_left = x;
     }

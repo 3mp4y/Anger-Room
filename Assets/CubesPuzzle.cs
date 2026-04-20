@@ -1,20 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 
 public class CubesPuzzle : MonoBehaviour
 {
-    private bool[] solved = {false,false,false,false,false};
-    public GameObject[] cubes = new GameObject[5];
-    public Material right;
-    public Material wrong;
-    private int tries = 0;
-    private int succeses = 0;
+    private bool[] solved = new bool[5];
+    public GameObject[] cards = new GameObject[5];
+    public int round = 1;
+    public int level = 1;
     public CountDown counScript;
+    private float time_shortening = 0.0f;
+    public bool anger_var;
     public AudioSource audioData;
-    public GameObject timer;
-    public GameObject congrats;
+    [SerializeField] TextMeshPro timer;
+    [SerializeField] TextMeshPro round_txt;
+    [SerializeField] TextMeshPro level_txt;
 
     // definisco le 3 possibili configurazioni iniziali risolvibili
     private bool[][] ConfigTrue = {
@@ -24,91 +26,98 @@ public class CubesPuzzle : MonoBehaviour
 };
 
     // definisco le 3 possibili configurazioni iniziali non risolvibili
-    private bool[][] ConfigFalse = {
+    private readonly bool[][] ConfigFalse = {
     new bool[] {false, false, false, false, false},
     new bool[] {true, true, true, false, false},
     new bool[] {true, false, true, false, true}
 };
 
+    void Update()
+    {
+        
+    }
     void Start()
     {
-     StartCoroutine(waiter());
+     //StartCoroutine(waiter());
+    }
+
+    public void PlaySound()
+    {
+        audioData.Play(0);
+    }
+
+    private void AdaptAll()
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            cards[i].SetActive(true);
+            if (solved[i])
+            {
+             cards[i].transform.eulerAngles = new Vector3(0.0f, 180.0f, 0.0f);
+            }
+            else
+            {
+             cards[i].transform.eulerAngles = new Vector3(0.0f, 0.0f, 0.0f);
+            }
+        }
     }
 
     IEnumerator waiter()
     {
         yield return new WaitForSeconds(5);
     }
-
-    public void playSound()
+        
+    public void CleanCards()
     {
-        audioData.Play(0); 
-        Debug.Log("Suono");
+        solved = new bool[5];
+        level = 1;
+        round = 1;
+        level_txt.text = string.Format("");
+        round_txt.text = string.Format("");
+        foreach (GameObject cube in cards)
+        {
+            cube.SetActive(false);
+        }
     }
     
-    public void StartPuzzlelay()
+    public void StartPuzzle()
+    {
+        CleanCards();
+        level_txt.text = string.Format("Level \n 0/ " + level);
+        round_txt.text = string.Format("Round \n 0/ " + round);
+        counScript.SetTimer(16);
+        StartCards(true);
+        Debug.Log( "Cards are" + solved[0] + solved[1] + solved[2] + solved[3] + solved[4]);
+    }
+
+    public void StartTutorial()
     {
         
-        CleanCubes();
-        congrats.SetActive(false);
-
-        if (tries<=2) {
-            StartTrue();
-        }
-        else
+       foreach (GameObject card in cards)
         {
-            StartFake();
+            card.SetActive(true);
         }
-
-        tries++;
-        Debug.Log("Cubes are" + solved[0] + solved[1] + solved[2] + solved[3] + solved[4]);
 
     }
 
-    void StartFake() {
+    void StartCards(bool conf) {
         // sorteggio una delle 3 configurazioni non risolvibili
-        int randomInRange = Random.Range(0, 3);
-        bool[] conf = ConfigFalse[randomInRange]; // conf sarà adesso la configurazione sorteggiata
+        if (conf)
+        {
+            ConfigTrue[Random.Range(0, 3)].CopyTo(solved, 0); // conf sarà adesso la configurazione sorteggiata
+            Debug.Log("True");
+        }
+        else 
+        {
+            ConfigFalse[Random.Range(0, 3)].CopyTo(solved, 0); // conf sarà adesso la configurazione sorteggiata
+            //solved = ConfigFalse[Random.Range(0, 3)]; // conf sarà adesso la configurazione sorteggiata
+            Debug.Log("Fake");
+        }
+        Debug.Log( "Cards start as" + solved[0] + solved[1] + solved[2] + solved[3] + solved[4]);
         
-        for (int i = 0; i < 5; i++)
-        {
-            if (conf[i])
-            {
-                cubes[i].GetComponent<Renderer>().material = right;
-            }
-            else
-            {
-                cubes[i].GetComponent<Renderer>().material = wrong;
-            }
-            solved[i] = conf[i];
-            cubes[i].SetActive(true);
-        }
-        Debug.Log("Fake");
+        AdaptAll();
+        
     }
-
-
-    void StartTrue() {
-        // sorteggio una delle 3 configurazioni risolvibili
-        int randomInRange = Random.Range(0, 3);
-        solved = ConfigTrue[randomInRange]; // conf sarà adesso la configurazione sorteggiata
-
-        for (int i = 0; i<5; i++)
-        {
-            if (solved[i])
-            {
-                cubes[i].GetComponent<Renderer>().material = right;
-            }
-            else
-            {
-                cubes[i].GetComponent<Renderer>().material = wrong;
-            }
-            cubes[i].SetActive(true);   
-        }
-        Debug.Log("True");
-
-    }
-
-
 
     public void ChangeCubeL() { //cambio i primi 3 cubi
         Change(0,1,2);
@@ -129,92 +138,65 @@ public class CubesPuzzle : MonoBehaviour
         solved[x] = !solved[x];
         solved[y] = !solved[y];
         solved[z] = !solved[z];
-        Debug.Log(solved);
-        for (int i = 0; i < 5; i++)
-        {
-            if (solved[i])
-            {
-                cubes[i].GetComponent<Renderer>().material = right;
-            }
-            else
-            {
-                cubes[i].GetComponent<Renderer>().material = wrong;
-            }
-        }
-        /*
-        if (solved[x] == true) {
-            solved[x] = false;
-            cubes[x].GetComponent<Renderer>().material = wrong;
-        }
-        else
-        {
-            solved[x] = true;
-            cubes[x].GetComponent<Renderer>().material = right;
-        }
-
-        if (solved[y] == true) {
-            solved[y] = false;
-            cubes[y].GetComponent<Renderer>().material = wrong;
-        }
-        else
-        {
-            solved[y] = true;
-            cubes[y].GetComponent<Renderer>().material = right;
-        }
-
-        if (solved[z] == true)
-        {
-            solved[z] = false;
-            cubes[z].GetComponent<Renderer>().material = wrong;
-        }
-        else
-        {
-            solved[z] = true;
-            cubes[z].GetComponent<Renderer>().material = right;
-        }
-        */
-
+        AdaptAll();
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    
 
     private void CheckResutls()
     {
         if (solved[0] && solved[1] && solved[2] && solved[3] && solved[4]) {
-            if (succeses < 2)
-            {
-                succeses++;
-                waiter();
-                StartTrue();
-                counScript.SetTimer(16);
-            }
-            else
-            {
-            Debug.Log("Solved!");
-            timer.SetActive(false);
-            congrats.SetActive(true);
-            }
-        }
 
-        Debug.Log("Cubes are" + solved[0] + solved[1] + solved[2] + solved[3] + solved[4]);
+            switch (level)
+            {
+                case 1:
+                case 2: if (round < 3)
+                        {
+                            round++;
+                            //waiter();
+                            Debug.Log("Solved" + round + "times");
+                            StartCards(true);
+                        }
+                        else
+                        {
+                        round = 1;
+                        level++;
+                        time_shortening += 2.5f;
+                        //timer.text = string.Format("Beggining Round " + rounds);
+                        StartCards(true);
+                        }
+                        counScript.SetTimer(16-time_shortening);
+                        break;
+                case 3: if (round < 3)
+                        {
+                            round++;
+                            //waiter();
+                            Debug.Log("Solved" + round + "times");
+                            if (Random.Range(round, round+2)+1 > 3 && anger_var)
+                            {
+                            StartCards(false);
+                            } 
+                            else
+                            {
+                            StartCards(true);
+                            }
+                            counScript.SetTimer(16-time_shortening);
+                        }
+                        else
+                        {
+                        Debug.Log("Solved!");
+                        counScript.SetPlay(false);
+                        timer.text = string.Format("Puzzle solved");
+                        }
+                        break;
+                default:
+                        Debug.Log("WHAT");
+                        break;
+                
+            }
+            level_txt.text = string.Format("Level \n" + level + "/3" );
+            round_txt.text = string.Format("Round \n" + round + "/3");
+        }   
     }
-    
-    public void CleanCubes()
-    {
-        for (int i = 0; i < 5; i++)
-        {
-            solved[i] = false;
-        }
-        foreach (GameObject cube in cubes)
-        {
-            cube.SetActive(false);
-        }
-    }
-        
 }
 
 

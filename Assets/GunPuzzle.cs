@@ -39,6 +39,16 @@ public class GunPuzzle : MonoBehaviour
         Spawner.SetActive(true);
     }
 
+    public void StartTutorial()
+    {   
+        fakegun.SetActive(false);
+        realgun.SetActive(true);
+        controllervisual1.SetActive(false);
+        controllervisual2.SetActive(false);
+        TextTimer.SetActive(true);
+        Spawner.SetActive(true);
+    }
+
     // Update is called once per frame
     void Update()
     {
