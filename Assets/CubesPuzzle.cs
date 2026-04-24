@@ -14,6 +14,7 @@ public class CubesPuzzle : MonoBehaviour
     private float time_shortening = 0.0f;
     public bool anger_var;
     public AudioSource audioData;
+    public AudioClip shuffle;
     [SerializeField] TextMeshPro timer;
     [SerializeField] TextMeshPro round_txt;
     [SerializeField] TextMeshPro level_txt;
@@ -53,13 +54,14 @@ public class CubesPuzzle : MonoBehaviour
             cards[i].SetActive(true);
             if (solved[i])
             {
-             cards[i].transform.eulerAngles = new Vector3(0.0f, 180.0f, 0.0f);
+             cards[i].transform.eulerAngles = new Vector3(90.0f, 270.0f, 90.0f);
             }
             else
             {
-             cards[i].transform.eulerAngles = new Vector3(0.0f, 0.0f, 0.0f);
+             cards[i].transform.eulerAngles = new Vector3(-90.0f, -180.0f, 0.0f);
             }
         }
+        audioData.PlayOneShot(shuffle);
     }
 
     IEnumerator waiter()
@@ -186,6 +188,8 @@ public class CubesPuzzle : MonoBehaviour
                         Debug.Log("Solved!");
                         counScript.SetPlay(false);
                         timer.text = string.Format("Puzzle solved");
+                        level_txt.text = string.Format("");
+                        round_txt.text = string.Format("");
                         }
                         break;
                 default:

@@ -9,7 +9,7 @@ public class ShootScript : MonoBehaviour
     public OVRInput.RawButton shootingButton;
     public LineRenderer lineRend;
     public Transform shootingpoiint;
-    public float maxLineDistance = 5;
+    public float maxLineDistance = 20;
     public float lineTime = 0.3f;
     public AudioSource sos;
     public AudioClip shot;
@@ -58,11 +58,11 @@ public class ShootScript : MonoBehaviour
     {
         reload = true;
         sos.PlayOneShot(shot);
-        Ray ray = new Ray(shootingpoiint.position, shootingpoiint.forward);
-        bool hasHit = Physics.Raycast(ray, out RaycastHit hit, maxLineDistance, mask);
+        Ray ray = new Ray(shootingpoiint.position, shootingpoiint.forward); //Inizializzi un laser "ray", position da dove parte il laser, forwward è la direzione BLU
+        bool hasHit = Physics.Raycast(ray, out RaycastHit hit, maxLineDistance, mask); //Controlla se il laser ray ha colpito qualcosa entro distanza maxLineDistance e che ha layer "mask", definito da noi a inizio codice
         Vector3 endPoint = Vector3.zero;
 
-        if (hasHit) {
+        if (hasHit) { //codice dove decidiamo che succede se viene colpito
             endPoint = hit.point;
             Target target = hit.transform.GetComponent<Target>();
 
