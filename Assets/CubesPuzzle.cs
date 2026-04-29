@@ -15,6 +15,7 @@ public class CubesPuzzle : MonoBehaviour
     public bool anger_var;
     public AudioSource audioData;
     public AudioClip shuffle;
+    public AudioClip lvlup;
     [SerializeField] TextMeshPro timer;
     [SerializeField] TextMeshPro round_txt;
     [SerializeField] TextMeshPro level_txt;
@@ -49,6 +50,7 @@ public class CubesPuzzle : MonoBehaviour
 
     private void AdaptAll()
     {
+        audioData.PlayOneShot(shuffle);
         for (int i = 0; i < 5; i++)
         {
             cards[i].SetActive(true);
@@ -61,7 +63,6 @@ public class CubesPuzzle : MonoBehaviour
              cards[i].transform.eulerAngles = new Vector3(-90.0f, -180.0f, 0.0f);
             }
         }
-        audioData.PlayOneShot(shuffle);
     }
 
     IEnumerator waiter()
@@ -123,17 +124,17 @@ public class CubesPuzzle : MonoBehaviour
 
     public void ChangeCubeL() { //cambio i primi 3 cubi
         Change(0,1,2);
-        CheckResutls();
+        StartCoroutine(CheckResutls());
     }
 
     public void ChangeCubeR() { //cambio gli ultimi 3 cubi
         Change(2,3,4);
-        CheckResutls();
+        StartCoroutine(CheckResutls());
     }
 
     public void ChangeCubeW() { //cambio i 3 cubi centrali
         Change(1,2,3);
-        CheckResutls();
+        StartCoroutine(CheckResutls());
     }
 
     public void Change(int x, int y, int z) {
@@ -143,8 +144,14 @@ public class CubesPuzzle : MonoBehaviour
         AdaptAll();
     }
     
+    private void lvlUp()
+    {
+        audioData.PlayOneShot(lvlup);
+        level_txt.text = string.Format("Level \n" + level + "/3" );
+        round_txt.text = string.Format("Round \n" + round + "/3");
+    }
 
-    private void CheckResutls()
+    private IEnumerator CheckResutls()
     {
         if (solved[0] && solved[1] && solved[2] && solved[3] && solved[4]) {
 
@@ -154,7 +161,8 @@ public class CubesPuzzle : MonoBehaviour
                 case 2: if (round < 3)
                         {
                             round++;
-                            //waiter();
+                            lvlUp();
+                            yield return new WaitForSeconds(0.7f);
                             Debug.Log("Solved" + round + "times");
                             StartCards(true);
                         }
@@ -162,15 +170,20 @@ public class CubesPuzzle : MonoBehaviour
                         {
                         round = 1;
                         level++;
+                        lvlUp();
+                        yield return new WaitForSeconds(1f);
                         time_shortening += 2.5f;
                         //timer.text = string.Format("Beggining Round " + rounds);
                         StartCards(true);
                         }
                         counScript.SetTimer(16-time_shortening);
                         break;
+
                 case 3: if (round < 3)
                         {
                             round++;
+                            lvlUp();
+                            yield return new WaitForSeconds(0.7f);
                             //waiter();
                             Debug.Log("Solved" + round + "times");
                             if (Random.Range(round, round+2)+1 > 3 && anger_var)
@@ -193,12 +206,11 @@ public class CubesPuzzle : MonoBehaviour
                         }
                         break;
                 default:
+                        level_txt.text = string.Format("    what" );
+                        round_txt.text = string.Format("uh???");
                         Debug.Log("WHAT");
                         break;
-                
             }
-            level_txt.text = string.Format("Level \n" + level + "/3" );
-            round_txt.text = string.Format("Round \n" + round + "/3");
         }   
     }
 }

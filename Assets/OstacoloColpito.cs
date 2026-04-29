@@ -24,8 +24,9 @@ public class OstacoloColpito : MonoBehaviour
         if (other.CompareTag("Ostacolo"))
         {
             Debug.Log("Ostacolo colpito, torna all'inizio del labirinto!");
-            transform.position = InizioLabirinto.position;
-            transform.rotation = InizioLabirinto.rotation;
+            Debug.Log(InizioLabirinto.localPosition);
+            transform.position = InizioLabirinto.localPosition;
+            transform.rotation = InizioLabirinto.localRotation;
 
             
         }

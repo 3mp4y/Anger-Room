@@ -116,7 +116,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e51e6a27d81dbca468f1ef417c43ba2c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  lifetime: 5
+  lifetime: 100
   scoreValue: 10
   hitVFXPrefab: {fileID: 0}
   hitSound: {fileID: 8300000, guid: f9b258ed65f40d6478c8469f9226ac3e, type: 3}
@@ -132,7 +132,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bde17573cb72d44b8ff9f5d062f9730, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minSpeed: 0.5
-  maxSpeed: 2
-  moveDuration: 5
+  minSpeed: 0
+  maxSpeed: 0
+  moveDuration: 10
   speedChangeInterval: 1
