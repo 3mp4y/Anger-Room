@@ -9,7 +9,7 @@ public class ShootScript : MonoBehaviour
     public OVRInput.RawButton shootingButton;
     public LineRenderer lineRend;
     public Transform shootingpoiint;
-    public float maxLineDistance = 20;
+    public float maxLineDistance;
     public float lineTime = 0.3f;
     public AudioSource sos;
     public AudioClip shot;
@@ -18,8 +18,7 @@ public class ShootScript : MonoBehaviour
     [SerializeField] [Range(0, 100)] public int failureChance; 
     private float timer;
     public float reloadTime = 1;
-
-    private int points = 0;
+    public GunPuzzle gunpuz;
     public int FailureChance
 {
     get => failureChance;
@@ -71,7 +70,7 @@ public class ShootScript : MonoBehaviour
                 if (Random.Range(0,101) >= failureChance)
                 {
                     target.OnHit();
-                    points++;
+                    gunpuz.GotHit();
 
                 }
                 else

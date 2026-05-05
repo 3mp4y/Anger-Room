@@ -48,4 +48,12 @@ public class TargetMover : MonoBehaviour
         // Move along local Z axis
         transform.Translate(Vector3.right * _currentSpeed * Time.deltaTime, Space.Self);
     }
+
+    public void ChangeSpeeds(float min, float max, float interval)
+    {
+        minSpeed =+ min;
+        maxSpeed =+ max;
+        speedChangeInterval = speedChangeInterval/2;
+        
+    }
 }

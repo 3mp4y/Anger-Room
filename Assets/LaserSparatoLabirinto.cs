@@ -34,15 +34,15 @@ public class LaserSparatoLabirinto : MonoBehaviour
     public void Shoot()
     {
         Ray ray = new Ray(OrigineLaser.position, OrigineLaser.forward);
-        Debug.Log(OrigineLaser.position);
-        Debug.Log(OrigineLaser.localPosition);
+        Debug.Log("Payer is at: " + Giocatore.transform.position);
+        Debug.Log("Start is at: " + InizioLabirinto.position);
         bool hasHit = Physics.Raycast(ray, out RaycastHit hit, maxLineDistance, Player);
         Vector3 endPoint = Vector3.zero;
 
         if (hasHit)
         {
             endPoint = hit.point;
-            Giocatore.transform.position = InizioLabirinto.position;
+            Giocatore.transform.position = new Vector3 (InizioLabirinto.position.x, Giocatore.transform.position.y, InizioLabirinto.position.z);
         }
         else //se non colpisce il giocatore, va dritto fino alla fine
         {
