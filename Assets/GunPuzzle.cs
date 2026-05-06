@@ -8,15 +8,14 @@ public class GunPuzzle : MonoBehaviour
     //Variables for gun and controller models
     public GameObject realgun;
     public GameObject fakegun;
-    public GameObject controllervisual1;
-    public GameObject controllervisual2;
+    [SerializeField] private GameObject parentObject;
+    private List<GameObject> _activeGrandchildren  = new List<GameObject>();
     //Varibales for the timer
     [SerializeField] TextMeshPro TMPTimer;
     [SerializeField] TextMeshPro Levels;
     [SerializeField] TextMeshPro hit_score;
     public float puzzleTimer;
     private float time_left;
-    //Others
     private bool started = false;
     public TargetMover targetMover;
     private bool won = false;
@@ -32,14 +31,37 @@ public class GunPuzzle : MonoBehaviour
         
     }
 
+    public void Begin()
+    {
+        _activeGrandchildren.Clear();
+
+        foreach (Transform child in parentObject.transform)
+        {
+            foreach (Transform grandchild in child)
+            {
+                if (grandchild.gameObject.activeSelf)
+                {
+                    Debug.Log(grandchild);
+                    _activeGrandchildren.Add(grandchild.gameObject);
+                    grandchild.gameObject.SetActive(false);
+                }
+            }
+        }
+    }
+    public void Reset()
+    {
+        foreach (GameObject grandchild in _activeGrandchildren)
+        {
+            grandchild.SetActive(true);
+        }
+    }
     public void StartGun()
     {   
         if (tries < 3)
         {
+        Begin();
         fakegun.SetActive(false);
         realgun.SetActive(true);
-        controllervisual1.SetActive(false);
-        controllervisual2.SetActive(false);
         started = true;
         time_left = puzzleTimer;
         Spawner.SetActive(true);
@@ -49,31 +71,21 @@ public class GunPuzzle : MonoBehaviour
         
     }
 
-    public void StartTutorial()
-    {   
-        fakegun.SetActive(false);
-        realgun.SetActive(true);
-        controllervisual1.SetActive(false);
-        controllervisual2.SetActive(false);
-        Spawner.SetActive(true);
-        
-    }
-
     // Update is called once per frame
     void Update()
     {
-        if (started && !won)
+        if (started && !won) 
+        {
         time_left -= Time.deltaTime;
         int minutes = Mathf.FloorToInt(time_left / 60);
         int seconds = Mathf.FloorToInt(time_left % 60);
         TMPTimer.text = string.Format("{0:00}:{1:00}", minutes, seconds);
-
+        }
         if (time_left <= 0)
             {
                 fakegun.SetActive(true);
                 realgun.SetActive(false);
-                controllervisual1.SetActive(true);
-                controllervisual2.SetActive(true);
+                Reset();
                 started = false;
                 TMPTimer.text = string.Format("");
                 time_left = puzzleTimer;
@@ -101,6 +113,7 @@ public class GunPuzzle : MonoBehaviour
             else
             {
             won = true;
+            time_left = 0;
             TMPTimer.text = string.Format("Puzzle solved");
             }
         }

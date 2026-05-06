@@ -27,7 +27,7 @@ public class Spawn2 : MonoBehaviour
         //Debug.Log(Random.Range(-1.5f, 1.5f));
     }
     public void SpawnTarget() {
-        Vector3 spawnPos = new Vector3(transform.localPosition.x, transform.localPosition.y + Random.Range(-1.5f, 1.5f), transform.localPosition.z);
+        Vector3 spawnPos = new Vector3(transform.position.x, transform.position.y + Random.Range(-1.5f, 1.5f), transform.position.z);
         //Vector3 spawnPos = new Vector3(spawn.transform.localPosition.x, Random.Range(1.5f, 3f), spawn.transform.localPosition.z);
         Instantiate(target, spawnPos, Quaternion.identity);
     }

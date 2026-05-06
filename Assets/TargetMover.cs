@@ -51,8 +51,8 @@ public class TargetMover : MonoBehaviour
 
     public void ChangeSpeeds(float min, float max, float interval)
     {
-        minSpeed =+ min;
-        maxSpeed =+ max;
+        minSpeed += min;
+        maxSpeed += max;
         speedChangeInterval = speedChangeInterval/2;
         
     }

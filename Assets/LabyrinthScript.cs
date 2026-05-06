@@ -5,7 +5,7 @@ using UnityEngine;
 public class LabyrinthScript : MonoBehaviour
 {
     public OVRInput.RawButton utton;
-    public GameObject cam1;
+    public GameObject blacked;
     public GameObject player;
     public GameObject newPos;
     // Start is called before the first frame update
@@ -20,10 +20,11 @@ public class LabyrinthScript : MonoBehaviour
 
     IEnumerator ShowMessages()
     {
-        cam1.SetActive(true);
+        blacked.SetActive(true);
         yield return new WaitForSeconds(2f); // wait 3 seconds
-        player.transform.position = new Vector3 (newPos.transform.position.x, player.transform.position.y, newPos.transform.position.z);
-        cam1.SetActive(false);
+        //player.transform.position = new Vector3 (newPos.transform.position.x, player.transform.position.y, newPos.transform.position.z);
+        player.transform.SetPositionAndRotation(new Vector3 (newPos.transform.position.x, player.transform.position.y, newPos.transform.position.z), player.transform.rotation);
+        blacked.SetActive(false);
     }   
     // Update is called once per frame
     void Update()
