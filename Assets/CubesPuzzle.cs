@@ -8,8 +8,8 @@ public class CubesPuzzle : MonoBehaviour
 {
     private bool[] solved = new bool[5];
     public GameObject[] cards = new GameObject[5];
-    public int round = 1;
-    public int level = 1;
+    private int round = 1;
+    private int level = 1;
     public CountDown counScript;
     private float time_shortening = 0.0f;
     public bool anger_var;
@@ -86,8 +86,8 @@ public class CubesPuzzle : MonoBehaviour
     public void StartPuzzle()
     {
         CleanCards();
-        level_txt.text = string.Format("Level \n 0/ " + level);
-        round_txt.text = string.Format("Round \n 0/ " + round);
+        level_txt.text = string.Format("Level \n" + level + "/3" );
+        round_txt.text = string.Format("Round \n" + round + "/3");
         counScript.SetTimer(16);
         StartCards(true);
         Debug.Log( "Cards are" + solved[0] + solved[1] + solved[2] + solved[3] + solved[4]);

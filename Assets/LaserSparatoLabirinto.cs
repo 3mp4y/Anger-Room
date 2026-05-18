@@ -13,10 +13,12 @@ public class LaserSparatoLabirinto : MonoBehaviour
     public float lineTime = 0.3f;
     public float intervalloSparo = 5f; //tempo tra un laser e l'altro
     public float timer = 0f;
+
+    AudioSource thisAudio;
     // Start is called before the first frame update
     void Start()
     {
-
+        thisAudio = GetComponent<AudioSource>();
     }
 
     // Update is called once per frame
@@ -33,9 +35,8 @@ public class LaserSparatoLabirinto : MonoBehaviour
 
     public void Shoot()
     {
+        thisAudio.Play();
         Ray ray = new Ray(OrigineLaser.position, OrigineLaser.forward);
-        Debug.Log("Payer is at: " + Giocatore.transform.position);
-        Debug.Log("Start is at: " + InizioLabirinto.position);
         bool hasHit = Physics.Raycast(ray, out RaycastHit hit, maxLineDistance, Player);
         Vector3 endPoint = Vector3.zero;
 
@@ -53,7 +54,7 @@ public class LaserSparatoLabirinto : MonoBehaviour
         line.positionCount = 2;
         line.SetPosition(0, OrigineLaser.position);
         line.SetPosition(1, endPoint);
-        //line.startWidth = 0.05f;
+        line.startWidth = 0.9f;
         //line.endWidth = 0.05f;
         Destroy(line.gameObject, lineTime);
 

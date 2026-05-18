@@ -19,16 +19,16 @@ public class GunPuzzle : MonoBehaviour
     private bool started = false;
     public TargetMover targetMover;
     private bool won = false;
-    private int tries = 0;
     private int hits = 0;
     private int level = 1;
+    public GamesManager gm;
 
     public GameObject Spawner;
     //CountDown counScript;
     // Start is called before the first frame update
     void Start()
     {
-        
+        time_left = puzzleTimer;
     }
 
     public void Begin()
@@ -57,8 +57,7 @@ public class GunPuzzle : MonoBehaviour
     }
     public void StartGun()
     {   
-        if (tries < 3)
-        {
+        
         Begin();
         fakegun.SetActive(false);
         realgun.SetActive(true);
@@ -67,7 +66,6 @@ public class GunPuzzle : MonoBehaviour
         Spawner.SetActive(true);
         hit_score.text = string.Format("Hits \n" + hits + "/15");
         Levels.text = string.Format("Level \n" + level + "/3");
-        }
         
     }
 
@@ -90,10 +88,10 @@ public class GunPuzzle : MonoBehaviour
                 TMPTimer.text = string.Format("");
                 time_left = puzzleTimer;
                 Spawner.SetActive(false);
-                tries++;
                 hit_score.text = string.Format("");
                 Levels.text = string.Format("");
                 TMPTimer.text = string.Format("");
+                gm.addTries(1);
             }
     }
 

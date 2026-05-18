@@ -11,14 +11,13 @@ public class ShootScript : MonoBehaviour
     public Transform shootingpoiint;
     public float maxLineDistance;
     public float lineTime = 0.3f;
-    public AudioSource sos;
-    public AudioClip shot;
-    public AudioClip bad;
     private bool reload = false;
     [SerializeField] [Range(0, 100)] public int failureChance; 
     private float timer;
     public float reloadTime = 1;
     public GunPuzzle gunpuz;
+
+    public AudioManager am;
     public int FailureChance
 {
     get => failureChance;
@@ -56,7 +55,7 @@ public class ShootScript : MonoBehaviour
     public void Shoot()
     {
         reload = true;
-        sos.PlayOneShot(shot);
+        am.playShot();
         Ray ray = new Ray(shootingpoiint.position, shootingpoiint.forward); //Inizializzi un laser "ray", position da dove parte il laser, forwward è la direzione BLU
         bool hasHit = Physics.Raycast(ray, out RaycastHit hit, maxLineDistance, mask); //Controlla se il laser ray ha colpito qualcosa entro distanza maxLineDistance e che ha layer "mask", definito da noi a inizio codice
         Vector3 endPoint = Vector3.zero;
@@ -75,19 +74,19 @@ public class ShootScript : MonoBehaviour
                 }
                 else
                 {
-                    sos.PlayOneShot(bad);
+                    am.playBad(1);
                 }
                 
             } 
             else
             {
-                sos.PlayOneShot(bad);
+                am.playBad(1);
             }
 
         }
         else
         {
-            sos.PlayOneShot(bad);
+            am.playBad(1);
             endPoint = shootingpoiint.position + shootingpoiint.forward * maxLineDistance;
 
         }
