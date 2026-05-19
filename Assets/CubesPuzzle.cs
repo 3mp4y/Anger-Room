@@ -8,17 +8,25 @@ public class CubesPuzzle : MonoBehaviour
 {
     private bool[] solved = new bool[5];
     public GameObject[] cards = new GameObject[5];
-    private int round = 1;
-    private int level = 1;
-    public CountDown counScript;
+    [SerializeField] int round = 1;
+    [SerializeField] int level = 1;
+    //public CountDown counScript;
     private float time_shortening = 0.0f;
     public bool anger_var;
     public AudioSource audioData;
     public AudioClip shuffle;
     public AudioClip lvlup;
-    [SerializeField] TextMeshPro timer;
+    [SerializeField] TextMeshPro timer_txt;
     [SerializeField] TextMeshPro round_txt;
     [SerializeField] TextMeshPro level_txt;
+    bool isPlaying = false;
+    public GamesManager gm;
+    public AudioManager am;
+    [SerializeField] float time_left;
+    public float puzzTimer;
+    
+    [Tooltip("The game starts in tutorial mode.")]
+    [SerializeField] bool tutorial;
 
     // definisco le 3 possibili configurazioni iniziali risolvibili
     private bool[][] ConfigTrue = {
@@ -36,16 +44,30 @@ public class CubesPuzzle : MonoBehaviour
 
     void Update()
     {
-        
+        int minutes = Mathf.FloorToInt(time_left / 60);
+        int seconds = Mathf.FloorToInt(time_left % 60);
+        if (isPlaying)
+        {
+            if (time_left > 0)
+            {
+                time_left -= Time.deltaTime;
+                timer_txt.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+            }
+            else
+            {
+                isPlaying = false;
+                gm.addTries(0);
+                am.playBad(0);
+                CleanCards();
+            }
+        }
     }
     void Start()
     {
-     //StartCoroutine(waiter());
-    }
-
-    public void PlaySound()
-    {
-        audioData.Play(0);
+     level_txt.text = string.Format("");
+     round_txt.text = string.Format("");
+     timer_txt.text = string.Format("");
+     //tutorial = true;
     }
 
     private void AdaptAll()
@@ -77,6 +99,7 @@ public class CubesPuzzle : MonoBehaviour
         round = 1;
         level_txt.text = string.Format("");
         round_txt.text = string.Format("");
+        timer_txt.text = string.Format("");
         foreach (GameObject cube in cards)
         {
             cube.SetActive(false);
@@ -85,26 +108,28 @@ public class CubesPuzzle : MonoBehaviour
     
     public void StartPuzzle()
     {
+        tutorial = false;
         CleanCards();
         level_txt.text = string.Format("Level \n" + level + "/3" );
         round_txt.text = string.Format("Round \n" + round + "/3");
-        counScript.SetTimer(16);
         StartCards(true);
+        isPlaying = true;
         Debug.Log( "Cards are" + solved[0] + solved[1] + solved[2] + solved[3] + solved[4]);
     }
 
     public void StartTutorial()
     {
-        
-       foreach (GameObject card in cards)
-        {
-            card.SetActive(true);
-        }
+        solved = new bool[] {true, true, true, true, true};
+        AdaptAll();
+        level_txt.text = string.Format("Level");
+        round_txt.text = string.Format("Round");
+        timer_txt.text = string.Format("Timer");
 
     }
 
     void StartCards(bool conf) {
         // sorteggio una delle 3 configurazioni non risolvibili
+        time_left = puzzTimer;
         if (conf)
         {
             ConfigTrue[Random.Range(0, 3)].CopyTo(solved, 0); // conf sarà adesso la configurazione sorteggiata
@@ -123,18 +148,33 @@ public class CubesPuzzle : MonoBehaviour
     }
 
     public void ChangeCubeL() { //cambio i primi 3 cubi
+        if(isPlaying) {
         Change(0,1,2);
         StartCoroutine(CheckResutls());
+        }
+        if(tutorial) {
+        Change(0,1,2);
+        }
     }
 
     public void ChangeCubeR() { //cambio gli ultimi 3 cubi
+        if(isPlaying) {
         Change(2,3,4);
         StartCoroutine(CheckResutls());
+        }
+        if(tutorial) {
+        Change(2,3,4);
+        }
     }
 
     public void ChangeCubeW() { //cambio i 3 cubi centrali
+        if(isPlaying) {
         Change(1,2,3);
         StartCoroutine(CheckResutls());
+        }
+        if(tutorial) {
+        Change(1,2,3);
+        }
     }
 
     public void Change(int x, int y, int z) {
@@ -176,7 +216,7 @@ public class CubesPuzzle : MonoBehaviour
                         //timer.text = string.Format("Beggining Round " + rounds);
                         StartCards(true);
                         }
-                        counScript.SetTimer(16-time_shortening);
+                        puzzTimer -=time_shortening;
                         break;
 
                 case 3: if (round < 3)
@@ -194,13 +234,13 @@ public class CubesPuzzle : MonoBehaviour
                             {
                             StartCards(true);
                             }
-                            counScript.SetTimer(16-time_shortening);
+                            puzzTimer -=time_shortening;
                         }
                         else
                         {
                         Debug.Log("Solved!");
-                        counScript.SetPlay(false);
-                        timer.text = string.Format("Puzzle solved");
+                        isPlaying = false;
+                        timer_txt.text = string.Format("Puzzle solved");
                         level_txt.text = string.Format("");
                         round_txt.text = string.Format("");
                         }

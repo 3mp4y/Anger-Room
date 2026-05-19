@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class OstacoloColpito : MonoBehaviour
 {
-    public Transform InizioLabirinto1;
-    public Transform InizioLabirinto2;
-    public Transform InizioLabirinto3;
+    public Transform InizioLabirinto;
+    //public Transform InizioLabirinto2;
+    //public Transform InizioLabirinto3;
     public GameObject Giocatore;
 
 
@@ -28,7 +28,10 @@ public class OstacoloColpito : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             Debug.Log("Ostacolo colpito, torna all'inizio del labirinto!");
+            Giocatore.transform.position = InizioLabirinto.position;
+            Giocatore.transform.rotation = InizioLabirinto.rotation;
             //calcolo le distanze tra il giocatore e gli inizi dei 3 labirinti per capire velocemente in che labirinto siamo
+            /*
             float distanza1 = Vector3.Distance(other.transform.position, InizioLabirinto1.position);
             float distanza2 = Vector3.Distance(other.transform.position, InizioLabirinto2.position);
             float distanza3 = Vector3.Distance(other.transform.position, InizioLabirinto3.position);
@@ -47,7 +50,7 @@ public class OstacoloColpito : MonoBehaviour
                 Giocatore.transform.position = InizioLabirinto3.position;
                 Giocatore.transform.rotation = InizioLabirinto3.rotation;
             }
-
+            */
 
         }
     }

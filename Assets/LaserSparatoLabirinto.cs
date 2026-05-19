@@ -54,7 +54,7 @@ public class LaserSparatoLabirinto : MonoBehaviour
         line.positionCount = 2;
         line.SetPosition(0, OrigineLaser.position);
         line.SetPosition(1, endPoint);
-        line.startWidth = 0.9f;
+        line.startWidth = 0.5f;
         //line.endWidth = 0.05f;
         Destroy(line.gameObject, lineTime);
 
