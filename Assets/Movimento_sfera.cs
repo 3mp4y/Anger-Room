@@ -20,6 +20,6 @@ public class Movimento_sfera : MonoBehaviour
         float movimento = Mathf.PingPong(Time.time * velocita, distanza);
 
         // Applica il movimento sull'asse X
-        transform.position = posizioneIniziale + new Vector3(movimento, 0, 0);
+        transform.position = posizioneIniziale + transform.right * movimento;
     }
 }

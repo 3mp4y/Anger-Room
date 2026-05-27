@@ -13,7 +13,7 @@ public class Target : MonoBehaviour
     public GameObject hitVFXPrefab;       // Optional particle on hit
     public AudioClip hitSound;
 
-    private AudioSource _audioSource;
+    private AudioSource _audioSource; 
     private bool _hasBeenHit = false;
 
     private void Start()

@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 9018178435053945326}
   - component: {fileID: 5172545089698964908}
   m_Layer: 0
-  m_Name: SparaLaser 1
+  m_Name: SparaLaser_INvisible
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -132,7 +132,7 @@ MonoBehaviour:
     m_Bits: 1
   Giocatore: {fileID: 0}
   InizioLabirinto: {fileID: 0}
-  lineRend: {fileID: 9156417411372157611, guid: 825ce8506f1f84f899e3dfad85bfab57, type: 3}
+  lineRend: {fileID: 9156417411372157611, guid: 61b450ed6a7753d468e57939fda5fabb, type: 3}
   lineTime: 0.3
   intervalloSparo: 5
   timer: 0

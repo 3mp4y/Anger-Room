@@ -12,23 +12,33 @@ public class GunPuzzle : MonoBehaviour
     private List<GameObject> _activeGrandchildren  = new List<GameObject>();
     //Varibales for the timer
     [SerializeField] TextMeshPro TMPTimer;
-    [SerializeField] TextMeshPro Levels;
-    [SerializeField] TextMeshPro hit_score;
+    [SerializeField] TextMeshPro TMPLevel;
+    [SerializeField] TextMeshPro TMPScore;
     public float puzzleTimer;
     private float time_left;
-    private bool started = false;
+    private bool started;
     public TargetMover targetMover;
-    private bool won = false;
-    private int hits = 0;
-    private int level = 1;
+    [SerializeField] private int hits;
+    private int level;
     public GamesManager gm;
-
     public GameObject Spawner;
+    [SerializeField] int score_to_reach;
+
+    public AudioManager am;
+
+    private bool tutorial;
     //CountDown counScript;
     // Start is called before the first frame update
     void Start()
     {
+        tutorial = false;
+        started = false;
+        hits = 0;
+        level = 1;
         time_left = puzzleTimer;
+        TMPScore.text = string.Format("");
+        TMPLevel.text = string.Format("");
+        TMPTimer.text = string.Format("");
     }
 
     public void Begin()
@@ -57,29 +67,43 @@ public class GunPuzzle : MonoBehaviour
     }
     public void StartGun()
     {   
-        
         Begin();
         fakegun.SetActive(false);
         realgun.SetActive(true);
+        gm.Playing();
         started = true;
+        hits = 0;
+        level = 1;
         time_left = puzzleTimer;
+        targetMover.SetSpeeds(0.2f, 0.6f, 2);
         Spawner.SetActive(true);
-        hit_score.text = string.Format("Hits \n" + hits + "/15");
-        Levels.text = string.Format("Level \n" + level + "/3");
-        
+        TMPScore.text = string.Format("Hits \n" + hits + "/" + score_to_reach);
+        TMPLevel.text = string.Format("Level \n" + level + "/3");
     }
 
+
+    public void StartTutorial2()
+    {
+        Begin();
+        tutorial = true;
+        gm.DoneTutorial(1);
+        gm.Playing();
+        TMPScore.text = string.Format("Targets to hit");
+        TMPLevel.text = string.Format("Level");
+        targetMover.SetSpeeds(0.0f, 0.0f, 1.0f);
+        StartCoroutine(Tutorial());
+    }
     // Update is called once per frame
     void Update()
     {
-        if (started && !won) 
+        if (started) 
         {
         time_left -= Time.deltaTime;
         int minutes = Mathf.FloorToInt(time_left / 60);
         int seconds = Mathf.FloorToInt(time_left % 60);
         TMPTimer.text = string.Format("{0:00}:{1:00}", minutes, seconds);
         }
-        if (time_left <= 0)
+        if (time_left <= 0 && !tutorial)
             {
                 fakegun.SetActive(true);
                 realgun.SetActive(false);
@@ -88,34 +112,70 @@ public class GunPuzzle : MonoBehaviour
                 TMPTimer.text = string.Format("");
                 time_left = puzzleTimer;
                 Spawner.SetActive(false);
-                hit_score.text = string.Format("");
-                Levels.text = string.Format("");
+                TMPScore.text = string.Format("");
+                TMPLevel.text = string.Format("");
                 TMPTimer.text = string.Format("");
                 gm.addTries(1);
             }
+      
+    }
+
+    private IEnumerator Tutorial()
+    {
+        yield return new WaitForSeconds(4);
+        realgun.SetActive(true);
+        fakegun.SetActive(false);
+        yield return new WaitForSeconds(20);
+        Spawner.SetActive(true);
+        time_left = 26;
+        while (time_left > 0f)
+        {
+            time_left -= Time.deltaTime;
+            int minutes = Mathf.FloorToInt(time_left / 60);
+            int seconds = Mathf.FloorToInt(time_left % 60);
+            TMPTimer.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+            yield return null;
+        }
+                fakegun.SetActive(true);
+                realgun.SetActive(false);
+                Reset();
+                time_left = puzzleTimer;
+                Spawner.SetActive(false);
+                TMPScore.text = string.Format("");
+                TMPLevel.text = string.Format("");
+                TMPTimer.text = string.Format("");
+                tutorial = false;
+                gm.stoppedPlaying();
+        
     }
 
     public void GotHit()
     {
-        hits++;
-        hit_score.text = string.Format("Hits \n" + hits + "/15");
-        if (hits > 4)
+        Debug.Log(tutorial);
+        if (!tutorial)
         {
+        Debug.Log("PuntoPrimo");
+        hits++;
+        //TMPScore.text = string.Format("Hits \n" + hits + "/" + score_to_reach);
+        if (hits > score_to_reach) {
             if (level < 3) 
             {
+            am.playLevelUp(1);
             hits = 0;
             level++;
-            Levels.text = string.Format("Level \n" + level + "/3");
-            targetMover.ChangeSpeeds(2.0f, 2.0f, 0.3f);
+            TMPLevel.text = string.Format("Level \n" + level + "/3");
+            TMPScore.text = string.Format("Hits \n" + hits + "/" + score_to_reach);
+            targetMover.SetSpeeds(targetMover.getMin() * 1.5f, targetMover.getMax() * 1.5f, targetMover.getInt() * 0.7f);
             }
             else
             {
-            won = true;
-            time_left = 0;
+            gm.GameWon(1);
+            gm.stoppedPlaying();
+            time_left = puzzleTimer;
             TMPTimer.text = string.Format("Puzzle solved");
             }
         }
-        
+        }
         
     }
 }

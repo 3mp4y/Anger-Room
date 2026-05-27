@@ -11,7 +11,7 @@ public class CubesPuzzle : MonoBehaviour
     [SerializeField] int round = 1;
     [SerializeField] int level = 1;
     //public CountDown counScript;
-    private float time_shortening = 0.0f;
+    private float time_shortening;
     public bool anger_var;
     public AudioSource audioData;
     public AudioClip shuffle;
@@ -67,6 +67,7 @@ public class CubesPuzzle : MonoBehaviour
      level_txt.text = string.Format("");
      round_txt.text = string.Format("");
      timer_txt.text = string.Format("");
+     time_shortening = 0.0f;
      //tutorial = true;
     }
 
@@ -85,11 +86,6 @@ public class CubesPuzzle : MonoBehaviour
              cards[i].transform.eulerAngles = new Vector3(-90.0f, -180.0f, 0.0f);
             }
         }
-    }
-
-    IEnumerator waiter()
-    {
-        yield return new WaitForSeconds(5);
     }
         
     public void CleanCards()
@@ -119,12 +115,21 @@ public class CubesPuzzle : MonoBehaviour
 
     public void StartTutorial()
     {
+        am.playTutorial(0);
+        gm.DoneTutorial(0);
+        gm.Playing();
         solved = new bool[] {true, true, true, true, true};
         AdaptAll();
         level_txt.text = string.Format("Level");
         round_txt.text = string.Format("Round");
         timer_txt.text = string.Format("Timer");
+        StartCoroutine(wait_for_tutorial());
+    }
 
+    public IEnumerator wait_for_tutorial()
+    {
+        yield return new WaitForSeconds(39.1f);
+        gm.stoppedPlaying();
     }
 
     void StartCards(bool conf) {
@@ -212,11 +217,11 @@ public class CubesPuzzle : MonoBehaviour
                         level++;
                         lvlUp();
                         yield return new WaitForSeconds(1f);
-                        time_shortening += 2.5f;
+                        time_shortening += 1.5f;
                         //timer.text = string.Format("Beggining Round " + rounds);
                         StartCards(true);
                         }
-                        puzzTimer -=time_shortening;
+                        time_left = puzzTimer-time_shortening;
                         break;
 
                 case 3: if (round < 3)
@@ -224,7 +229,6 @@ public class CubesPuzzle : MonoBehaviour
                             round++;
                             lvlUp();
                             yield return new WaitForSeconds(0.7f);
-                            //waiter();
                             Debug.Log("Solved" + round + "times");
                             if (Random.Range(round, round+2)+1 > 3 && anger_var)
                             {
@@ -234,7 +238,7 @@ public class CubesPuzzle : MonoBehaviour
                             {
                             StartCards(true);
                             }
-                            puzzTimer -=time_shortening;
+                        time_left = puzzTimer - time_shortening*2;
                         }
                         else
                         {
@@ -243,6 +247,8 @@ public class CubesPuzzle : MonoBehaviour
                         timer_txt.text = string.Format("Puzzle solved");
                         level_txt.text = string.Format("");
                         round_txt.text = string.Format("");
+                        gm.GameWon(0);
+                        gm.stoppedPlaying();
                         }
                         break;
                 default:

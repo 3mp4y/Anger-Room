@@ -5,23 +5,31 @@ public class TargetMover : MonoBehaviour
 {
     [Header("Movement")]
     [Tooltip("Minimum movement speed (units/sec)")]
-    public float minSpeed = 0.5f;
+    public float minSpeed;
     [Tooltip("Maximum movement speed (units/sec)")]
-    public float maxSpeed = 2.0f;
-    [Tooltip("How long the target moves before stopping")]
-    public float moveDuration = 5f;
+    public float maxSpeed;
     [Tooltip("How often the speed randomizes (seconds)")]
-    public float speedChangeInterval = 1f;
+    public float speedChangeInterval;
 
     private float _currentSpeed;
     private float _timeAlive = 0f;
     private float _timeSinceSpeedChange = 0f;
     private bool _isMoving = true;
 
+    private int direction;
+
     private void Start()
     {
         // Pick an initial speed immediately on spawn
         _currentSpeed = Random.Range(minSpeed, maxSpeed);
+        if (Random.Range(0,101) > 50)
+        {
+            direction = 1;
+        }
+        else
+        {
+            direction = -1;
+        }
     }
 
     private void Update()
@@ -31,13 +39,6 @@ public class TargetMover : MonoBehaviour
         _timeAlive += Time.deltaTime;
         _timeSinceSpeedChange += Time.deltaTime;
 
-        // Stop after moveDuration
-        if (_timeAlive >= moveDuration)
-        {
-            _isMoving = false;
-            return;
-        }
-
         // Randomize speed every speedChangeInterval seconds
         if (_timeSinceSpeedChange >= speedChangeInterval)
         {
@@ -46,14 +47,27 @@ public class TargetMover : MonoBehaviour
         }
 
         // Move along local Z axis
-        transform.Translate(Vector3.right * _currentSpeed * Time.deltaTime, Space.Self);
+        transform.Translate(Vector3.right * _currentSpeed * direction * Time.deltaTime, Space.Self);
     }
 
-    public void ChangeSpeeds(float min, float max, float interval)
+    public void SetSpeeds(float min, float max, float interval)
     {
-        minSpeed += min;
-        maxSpeed += max;
-        speedChangeInterval = speedChangeInterval/2;
-        
+        minSpeed = min;
+        maxSpeed = max;
+        speedChangeInterval = interval;
+    }  
+
+    public float getMin()
+    {
+        return minSpeed;
+    }
+
+    public float getMax()
+    {
+        return maxSpeed;
+    }
+    public float getInt()
+    {
+        return speedChangeInterval;
     }
 }

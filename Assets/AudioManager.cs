@@ -7,14 +7,15 @@ public class AudioManager : MonoBehaviour
     public AudioSource[] games = new AudioSource[3];
     public AudioSource audienceRight;
     public AudioSource audienceLeft;
-
     public AudioSource presenter;
-    public List<AudioClip> presenter_generci_insults;
-    public List<AudioClip> audience_generci_insults;
-    public AudioClip bad;
-    public AudioClip lvlUP;
-
-    public AudioClip shot;
+    [SerializeField] AudioClip[] tutorials = new AudioClip[3];
+    [SerializeField] List<AudioClip> presenter_generci_insults;
+    [SerializeField] List<AudioClip> audience_generci_insults;
+    [SerializeField] AudioClip bad;
+    [SerializeField] AudioClip lvlUP;
+    [SerializeField] AudioClip won;
+    [SerializeField] AudioClip shot;
+    [SerializeField] AudioClip elevator;
     // Start is called before the first frame update
     void Start()
     {
@@ -32,11 +33,28 @@ public class AudioManager : MonoBehaviour
         games[game].PlayOneShot(bad);
     }
 
+    public void playLevelUp(int game)
+    {
+        games[game].PlayOneShot(lvlUP);
+    }
+    public void playTutorial(int game)
+    {
+     presenter.PlayOneShot(tutorials[game]);
+    }
     public void playShot()
     {
         games[1].PlayOneShot(shot);
     }
 
+    public void playEnd()
+    {
+        presenter.PlayOneShot(won);
+    }
+
+    public void playElevator()
+    {
+     games[2].PlayOneShot(elevator);
+    }
     public void play_gen_insult()
     {
         // Randomly choose between A and B

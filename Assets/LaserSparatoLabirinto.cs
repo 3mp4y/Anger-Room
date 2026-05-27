@@ -7,6 +7,7 @@ public class LaserSparatoLabirinto : MonoBehaviour
     public Transform OrigineLaser;
     public float maxLineDistance = 20;
     public LayerMask Player;
+    public LayerMask Any;
     public GameObject Giocatore;
     public Transform InizioLabirinto;
     public LineRenderer lineRend;
@@ -37,24 +38,27 @@ public class LaserSparatoLabirinto : MonoBehaviour
     {
         thisAudio.Play();
         Ray ray = new Ray(OrigineLaser.position, OrigineLaser.forward);
+        bool hasHitAny = Physics.Raycast(ray, out RaycastHit hitAny, maxLineDistance, Any);
         bool hasHit = Physics.Raycast(ray, out RaycastHit hit, maxLineDistance, Player);
         Vector3 endPoint = Vector3.zero;
-
-        if (hasHit)
+        if (hasHitAny)
         {
-            endPoint = hit.point;
+            endPoint = hitAny.point;
+            if (hasHit)
+            {
             Giocatore.transform.position = new Vector3 (InizioLabirinto.position.x, Giocatore.transform.position.y, InizioLabirinto.position.z);
+            }
         }
         else //se non colpisce il giocatore, va dritto fino alla fine
         {
             endPoint = OrigineLaser.position + OrigineLaser.forward * maxLineDistance;
         }
-
+        
         LineRenderer line = Instantiate(lineRend);
         line.positionCount = 2;
         line.SetPosition(0, OrigineLaser.position);
         line.SetPosition(1, endPoint);
-        line.startWidth = 0.5f;
+        line.startWidth = 0.3f;
         //line.endWidth = 0.05f;
         Destroy(line.gameObject, lineTime);
 
