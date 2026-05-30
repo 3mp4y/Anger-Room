@@ -21,7 +21,7 @@ public class GunPuzzle : MonoBehaviour
     [SerializeField] private int hits;
     private int level;
     public GamesManager gm;
-    public GameObject Spawner;
+    public Spawn2 Spawner;
     [SerializeField] int score_to_reach;
 
     public AudioManager am;
@@ -51,7 +51,7 @@ public class GunPuzzle : MonoBehaviour
             {
                 if (grandchild.gameObject.activeSelf)
                 {
-                    Debug.Log(grandchild);
+                    //Debug.Log(grandchild);
                     _activeGrandchildren.Add(grandchild.gameObject);
                     grandchild.gameObject.SetActive(false);
                 }
@@ -76,7 +76,8 @@ public class GunPuzzle : MonoBehaviour
         level = 1;
         time_left = puzzleTimer;
         targetMover.SetSpeeds(0.2f, 0.6f, 2);
-        Spawner.SetActive(true);
+        Spawner.setSpawnTime(1.3f);
+        Spawner.started = true;
         TMPScore.text = string.Format("Hits \n" + hits + "/" + score_to_reach);
         TMPLevel.text = string.Format("Level \n" + level + "/3");
     }
@@ -111,11 +112,12 @@ public class GunPuzzle : MonoBehaviour
                 started = false;
                 TMPTimer.text = string.Format("");
                 time_left = puzzleTimer;
-                Spawner.SetActive(false);
+                Spawner.started = false;
                 TMPScore.text = string.Format("");
                 TMPLevel.text = string.Format("");
                 TMPTimer.text = string.Format("");
                 gm.addTries(1);
+                am.playBad(1);
             }
       
     }
@@ -126,8 +128,9 @@ public class GunPuzzle : MonoBehaviour
         realgun.SetActive(true);
         fakegun.SetActive(false);
         yield return new WaitForSeconds(20);
-        Spawner.SetActive(true);
-        time_left = 26;
+        Spawner.started = true;
+        Spawner.setSpawnTime(5.0f);
+        time_left = 26.0f;
         while (time_left > 0f)
         {
             time_left -= Time.deltaTime;
@@ -140,7 +143,7 @@ public class GunPuzzle : MonoBehaviour
                 realgun.SetActive(false);
                 Reset();
                 time_left = puzzleTimer;
-                Spawner.SetActive(false);
+                Spawner.started = false;
                 TMPScore.text = string.Format("");
                 TMPLevel.text = string.Format("");
                 TMPTimer.text = string.Format("");
@@ -151,12 +154,10 @@ public class GunPuzzle : MonoBehaviour
 
     public void GotHit()
     {
-        Debug.Log(tutorial);
         if (!tutorial)
         {
-        Debug.Log("PuntoPrimo");
         hits++;
-        //TMPScore.text = string.Format("Hits \n" + hits + "/" + score_to_reach);
+        TMPScore.text = string.Format("Hits \n" + hits + "/" + score_to_reach);
         if (hits > score_to_reach) {
             if (level < 3) 
             {
@@ -165,14 +166,22 @@ public class GunPuzzle : MonoBehaviour
             level++;
             TMPLevel.text = string.Format("Level \n" + level + "/3");
             TMPScore.text = string.Format("Hits \n" + hits + "/" + score_to_reach);
-            targetMover.SetSpeeds(targetMover.getMin() * 1.5f, targetMover.getMax() * 1.5f, targetMover.getInt() * 0.7f);
+            targetMover.SetSpeeds(targetMover.getMin() + 1f, targetMover.getMax() + 1f, targetMover.getInt() * 0.7f);
+            time_left = 21;
             }
             else
             {
             gm.GameWon(1);
             gm.stoppedPlaying();
+            started = false;
             time_left = puzzleTimer;
             TMPTimer.text = string.Format("Puzzle solved");
+            fakegun.SetActive(true);
+            realgun.SetActive(false);
+            Reset();
+            Spawner.started = false;
+            TMPScore.text = string.Format("");
+            TMPLevel.text = string.Format("");
             }
         }
         }

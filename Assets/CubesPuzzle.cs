@@ -138,15 +138,15 @@ public class CubesPuzzle : MonoBehaviour
         if (conf)
         {
             ConfigTrue[Random.Range(0, 3)].CopyTo(solved, 0); // conf sarà adesso la configurazione sorteggiata
-            Debug.Log("True");
+            //Debug.Log("True");
         }
         else 
         {
             ConfigFalse[Random.Range(0, 3)].CopyTo(solved, 0); // conf sarà adesso la configurazione sorteggiata
             //solved = ConfigFalse[Random.Range(0, 3)]; // conf sarà adesso la configurazione sorteggiata
-            Debug.Log("Fake");
+            //Debug.Log("Fake");
         }
-        Debug.Log( "Cards start as" + solved[0] + solved[1] + solved[2] + solved[3] + solved[4]);
+        //Debug.Log( "Cards start as" + solved[0] + solved[1] + solved[2] + solved[3] + solved[4]);
         
         AdaptAll();
         
@@ -207,8 +207,8 @@ public class CubesPuzzle : MonoBehaviour
                         {
                             round++;
                             lvlUp();
-                            yield return new WaitForSeconds(0.7f);
-                            Debug.Log("Solved" + round + "times");
+                            yield return new WaitForSeconds(0.8f);
+                            //Debug.Log("Solved" + round + "times");
                             StartCards(true);
                         }
                         else
@@ -228,7 +228,7 @@ public class CubesPuzzle : MonoBehaviour
                         {
                             round++;
                             lvlUp();
-                            yield return new WaitForSeconds(0.7f);
+                            yield return new WaitForSeconds(0.6f);
                             Debug.Log("Solved" + round + "times");
                             if (Random.Range(round, round+2)+1 > 3 && anger_var)
                             {
@@ -242,7 +242,7 @@ public class CubesPuzzle : MonoBehaviour
                         }
                         else
                         {
-                        Debug.Log("Solved!");
+                        //Debug.Log("Solved!");
                         isPlaying = false;
                         timer_txt.text = string.Format("Puzzle solved");
                         level_txt.text = string.Format("");
@@ -254,7 +254,7 @@ public class CubesPuzzle : MonoBehaviour
                 default:
                         level_txt.text = string.Format("    what" );
                         round_txt.text = string.Format("uh???");
-                        Debug.Log("WHAT");
+                        //Debug.Log("WHAT");
                         break;
             }
         }   
