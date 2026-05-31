@@ -30,16 +30,23 @@ public class CubesPuzzle : MonoBehaviour
 
     // definisco le 3 possibili configurazioni iniziali risolvibili
     private bool[][] ConfigTrue = {
+    //DxSx
     new bool[] {false, false, true, false, false},
+    //SxCntr
     new bool[] {false, true, true, false, true},
+    //DxCtrl
+    new bool[] {true, false, true, true, false},
+    //SxDxCntrl
     new bool[] {false, true, false, true, false}
+    
 };
 
     // definisco le 3 possibili configurazioni iniziali non risolvibili
     private readonly bool[][] ConfigFalse = {
-    new bool[] {false, false, false, false, false},
+    new bool[] {false, false, false, false, true},
     new bool[] {true, true, true, false, false},
-    new bool[] {true, false, true, false, true}
+    new bool[] {true, false, true, false, true},
+    new bool[] {true, true, true, true, false}
 };
 
     void Update()
@@ -96,9 +103,9 @@ public class CubesPuzzle : MonoBehaviour
         level_txt.text = string.Format("");
         round_txt.text = string.Format("");
         timer_txt.text = string.Format("");
-        foreach (GameObject cube in cards)
+        foreach (GameObject card in cards)
         {
-            cube.SetActive(false);
+            card.SetActive(false);
         }
     }
     
@@ -137,12 +144,12 @@ public class CubesPuzzle : MonoBehaviour
         time_left = puzzTimer;
         if (conf)
         {
-            ConfigTrue[Random.Range(0, 3)].CopyTo(solved, 0); // conf sarà adesso la configurazione sorteggiata
+            ConfigTrue[Random.Range(0, 4)].CopyTo(solved, 0); // conf sarà adesso la configurazione sorteggiata
             //Debug.Log("True");
         }
         else 
         {
-            ConfigFalse[Random.Range(0, 3)].CopyTo(solved, 0); // conf sarà adesso la configurazione sorteggiata
+            ConfigFalse[Random.Range(0, 4)].CopyTo(solved, 0); // conf sarà adesso la configurazione sorteggiata
             //solved = ConfigFalse[Random.Range(0, 3)]; // conf sarà adesso la configurazione sorteggiata
             //Debug.Log("Fake");
         }

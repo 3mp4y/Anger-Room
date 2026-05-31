@@ -33,7 +33,6 @@ public class AudioManager : MonoBehaviour
         audience_specific_insults[0] = audience_card_insults;
         audience_specific_insults[1] = audience_gun_insults;
         audience_specific_insults[2] = audience_lab_insults;
-        
     }
 
     // Update is called once per frame
@@ -48,12 +47,14 @@ public class AudioManager : MonoBehaviour
     }
     private IEnumerator Introduction()
     {
+          Debug.Log("Inizio Intro");
         yield return new WaitForSeconds(3);
         presenter.PlayOneShot(first_intro);
         while (presenter.isPlaying)
             {
                 yield return null;
             }
+          Debug.Log("fine intro");
         gm.StartOverAllTimer();
     }
     public void playBad(int game)
@@ -144,12 +145,10 @@ public class AudioManager : MonoBehaviour
         if (Random.value < 0.5f)
         {
             targetSource = audienceLeft;
-            Debug.Log("Left");
         }
         else
         {
            targetSource = audienceRight;
-           Debug.Log("Right");
         }
         }
         else

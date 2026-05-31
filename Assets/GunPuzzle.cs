@@ -23,7 +23,8 @@ public class GunPuzzle : MonoBehaviour
     public GamesManager gm;
     public Spawn2 Spawner;
     [SerializeField] int score_to_reach;
-
+    [SerializeField] ShootScript shoot_script;
+    [SerializeField] bool angerVar;
     public AudioManager am;
 
     private bool tutorial;
@@ -39,6 +40,7 @@ public class GunPuzzle : MonoBehaviour
         TMPScore.text = string.Format("");
         TMPLevel.text = string.Format("");
         TMPTimer.text = string.Format("");
+        shoot_script.failureChance = 0;
     }
 
     public void Begin()
@@ -158,16 +160,27 @@ public class GunPuzzle : MonoBehaviour
         {
         hits++;
         TMPScore.text = string.Format("Hits \n" + hits + "/" + score_to_reach);
-        if (hits > score_to_reach) {
-            if (level < 3) 
+        if (hits >= score_to_reach) {
+            if (level <= 3) 
             {
             am.playLevelUp(1);
             hits = 0;
             level++;
             TMPLevel.text = string.Format("Level \n" + level + "/3");
             TMPScore.text = string.Format("Hits \n" + hits + "/" + score_to_reach);
-            targetMover.SetSpeeds(targetMover.getMin() + 1f, targetMover.getMax() + 1f, targetMover.getInt() * 0.7f);
+            targetMover.SetSpeeds(targetMover.getMin() + 1.3f, targetMover.getMax() + 1.7f, targetMover.getInt() * 0.7f);
             time_left = 21;
+            if (angerVar)
+                    {
+                     if (shoot_script.failureChance < 10)
+                        {
+                            shoot_script.failureChance = 10;
+                        }
+                    else
+                        {
+                            shoot_script.failureChance += 20;
+                        }
+                    }
             }
             else
             {

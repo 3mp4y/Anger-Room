@@ -31,10 +31,13 @@ public class GamesManager : MonoBehaviour
             _activationList.Add(butt);
         }
         am.PlayIntro();
+        Playing();
+        time_left_exp = timer_experiment;
     }
 
     public void StartOverAllTimer()
     {
+        stoppedPlaying();
         isgoing = true;
         StartCoroutine(OverallTimer());
     }
@@ -46,6 +49,7 @@ public class GamesManager : MonoBehaviour
         int seconds = Mathf.FloorToInt(time_left_exp % 60);
             if (time_left_exp > 0)
             {
+              Debug.Log("Inizio Timer");
             time_left_exp -= Time.deltaTime;
             TMPtime_left_exp.text = string.Format("{0:00}:{1:00}", minutes, seconds);
             }
@@ -57,8 +61,8 @@ public class GamesManager : MonoBehaviour
             DeactivatingButtons();
             am.playLoss();
             isgoing = false;
-            yield return null;
             }
+            yield return null;
         }
     }
     
