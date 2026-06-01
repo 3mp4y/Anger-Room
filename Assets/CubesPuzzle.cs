@@ -63,9 +63,9 @@ public class CubesPuzzle : MonoBehaviour
             else
             {
                 isPlaying = false;
-                gm.addTries(0);
-                am.playBad(0);
                 CleanCards();
+                gm.addTries(0, timer_txt);
+                am.playBad(0);
             }
         }
     }

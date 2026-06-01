@@ -87,7 +87,7 @@ public class LabyrinthScript : MonoBehaviour
                 TMPTimer.text = string.Format("");
                 time_left = puzzleTimer;
                 am.playBad(2);
-                gm.addTries(2);
+                gm.addTries(2, congrats);
             }
         }
     }

@@ -5839,7 +5839,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 152575653}
   m_LocalRotation: {x: -0.60181504, y: -0, z: -0, w: 0.7986355}
-  m_LocalPosition: {x: 0, y: 0, z: -0.20399976}
+  m_LocalPosition: {x: 0, y: 0, z: -0.44}
   m_LocalScale: {x: 0.070000015, y: 0.07000002, z: 0.07000002}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -5847,8 +5847,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 16, y: 180, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.078048706, y: 0.20868409}
-  m_SizeDelta: {x: 20, y: 5}
+  m_AnchoredPosition: {x: -0.078048706, y: 0.274}
+  m_SizeDelta: {x: 27.8, y: 8.9255}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &152575655
 MonoBehaviour:
@@ -5870,7 +5870,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Puzzle Solved
+  m_text: 'Hai perso :(
+
+    Tentativi Rimasti: 2'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -28562,7 +28564,7 @@ GameObject:
   - component: {fileID: 578689489}
   - component: {fileID: 578689488}
   m_Layer: 0
-  m_Name: Cylinder
+  m_Name: Cylinder2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28577,8 +28579,8 @@ Transform:
   m_GameObject: {fileID: 578689486}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0.000000039713136, z: 0.7999983}
-  m_LocalScale: {x: 1.4915358, y: 0.8223998, z: 1.066041}
+  m_LocalPosition: {x: -0.07999754, y: -0.13205425, z: 0.7819997}
+  m_LocalScale: {x: 1.4915365, y: 0.8223998, z: 1.0660415}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 763565206}
@@ -40142,7 +40144,7 @@ GameObject:
   - component: {fileID: 899800161}
   - component: {fileID: 899800160}
   m_Layer: 0
-  m_Name: Cylinder
+  m_Name: Cylinder1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -40157,8 +40159,8 @@ Transform:
   m_GameObject: {fileID: 899800158}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: -0, z: 0.8}
-  m_LocalScale: {x: 1.4915358, y: 0.8223998, z: 1.066041}
+  m_LocalPosition: {x: 0.04900214, y: 0, z: 0.7999997}
+  m_LocalScale: {x: 1.4915366, y: 0.8223998, z: 1.0660414}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1955941527}
@@ -40696,16 +40698,16 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 919318968}
   m_LocalRotation: {x: 0, y: 0.9902681, z: -0.13917309, w: 0}
-  m_LocalPosition: {x: 0, y: 0, z: 0.21}
-  m_LocalScale: {x: 0.070000015, y: 0.070000015, z: 0.070000015}
+  m_LocalPosition: {x: 0, y: 0, z: 0.14629969}
+  m_LocalScale: {x: 0.07, y: 0.07, z: 0.07}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 2134677000}
   m_LocalEulerAnglesHint: {x: 16, y: 180, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.199, y: -0.337}
-  m_SizeDelta: {x: 20, y: 5}
+  m_AnchoredPosition: {x: -0.199, y: -0.10669984}
+  m_SizeDelta: {x: 28.31, y: 8.2874}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &919318971
 MonoBehaviour:
@@ -40727,7 +40729,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Puzzle Solved
+  m_text: 'Hai perso :(
+
+    Tentativi Rimasti: 2'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -52006,7 +52010,7 @@ GameObject:
   - component: {fileID: 1207321887}
   - component: {fileID: 1207321886}
   m_Layer: 0
-  m_Name: Cylinder
+  m_Name: Cylinder3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -52021,8 +52025,8 @@ Transform:
   m_GameObject: {fileID: 1207321884}
   serializedVersion: 2
   m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0.000000039713136, z: 0.7999983}
-  m_LocalScale: {x: 1.4915358, y: 0.8223998, z: 1.066041}
+  m_LocalPosition: {x: -0.040003438, y: -0.13205425, z: 0.7419996}
+  m_LocalScale: {x: 1.4915365, y: 0.8223998, z: 1.0660415}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 188382506}
@@ -67720,7 +67724,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1705497638}
   m_LocalRotation: {x: 0.47924694, y: -0, z: -0, w: 0.8776801}
-  m_LocalPosition: {x: 0, y: 0, z: 0.25416195}
+  m_LocalPosition: {x: 0, y: 0, z: 0.422}
   m_LocalScale: {x: 0.07, y: 0.07, z: 0.07}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -67728,8 +67732,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 57.272, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.4081998, y: -0.3513941}
-  m_SizeDelta: {x: 21.2344, y: 5}
+  m_AnchoredPosition: {x: -0.3964, y: -0.244}
+  m_SizeDelta: {x: 32.0454, y: 7.8328}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1705497640
 MonoBehaviour:
@@ -67751,7 +67755,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Puzzle Solved
+  m_text: 'Hai perso :(
+
+    Tentativi Rimasti: 2'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

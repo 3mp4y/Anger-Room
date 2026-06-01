@@ -93,6 +93,7 @@ public class GunPuzzle : MonoBehaviour
         gm.Playing();
         TMPScore.text = string.Format("Targets to hit");
         TMPLevel.text = string.Format("Level");
+        TMPTimer.text = string.Format("Timer");
         targetMover.SetSpeeds(0.0f, 0.0f, 1.0f);
         StartCoroutine(Tutorial());
     }
@@ -117,8 +118,7 @@ public class GunPuzzle : MonoBehaviour
                 Spawner.started = false;
                 TMPScore.text = string.Format("");
                 TMPLevel.text = string.Format("");
-                TMPTimer.text = string.Format("");
-                gm.addTries(1);
+                gm.addTries(1, TMPTimer);
                 am.playBad(1);
             }
       
@@ -151,7 +151,6 @@ public class GunPuzzle : MonoBehaviour
                 TMPTimer.text = string.Format("");
                 tutorial = false;
                 gm.stoppedPlaying();
-        
     }
 
     public void GotHit()

@@ -49,7 +49,6 @@ public class GamesManager : MonoBehaviour
         int seconds = Mathf.FloorToInt(time_left_exp % 60);
             if (time_left_exp > 0)
             {
-              Debug.Log("Inizio Timer");
             time_left_exp -= Time.deltaTime;
             TMPtime_left_exp.text = string.Format("{0:00}:{1:00}", minutes, seconds);
             }
@@ -94,21 +93,41 @@ public class GamesManager : MonoBehaviour
         }
     }
     // Update is called once per frame
-    public void addTries(int i)
+    public void addTries(int i, TextMeshPro message)
     {
         stoppedPlaying();
         if (gameTries[i] < 3)
         {
             gameTries[i] += 1;
+            StartCoroutine(lossMessage(gameTries[i], false, message));
         }
         else
         {
+        StartCoroutine(lossMessage(gameTries[i], true, message));
         _reactivationBlacklist.Add(realButtons[i]);
         }
         bulbs[i].GetComponent<Renderer>().material = lights[gameTries[i]-1];
         CheckLost();
     }
 
+     private IEnumerator lossMessage(int tries, bool loss, TextMeshPro message)
+    {
+        if (!loss) {
+        int reamaingTries = 3 - tries;
+        message.text = string.Format("Hai perso :( \n Tentativi rimasti: " + reamaingTries);
+        yield return new WaitForSeconds(4);
+        message.text = string.Format("");
+        }
+        else
+        {
+        message.text = string.Format("Hai perso! \n Puzzle disattivato.");
+        }
+    }
+
+    public int getRemainingTries(int game)
+    {
+        return 3-gameTries[game];
+    }
     public void CheckLost()
     {
         if (gameTries[0] == 3 && gameTries[1] == 3 && gameTries[2] == 3)

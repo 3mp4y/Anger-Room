@@ -26,7 +26,7 @@ public class CountDown : MonoBehaviour
             else
             {   
                 isPlaying = false;
-                gm.addTries(0);
+                //gm.addTries(0);
                 //puzz.PlaySound();
                 puzz.CleanCards();
                 countd.text = string.Format("");
