@@ -122,6 +122,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d9c6f3ec010f4f1c9b4da7d801abe10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  am: {fileID: 0}
+  logger: {fileID: 0}
   OrigineLaser: {fileID: 3829687031325936299}
   maxLineDistance: 20
   Player:
@@ -148,7 +150,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 8ccc3d81a81a1294ca96c871a2af17bc, type: 3}
   m_PlayOnAwake: 0
-  m_Volume: 1
+  m_Volume: 0.33
   m_Pitch: 1
   Loop: 0
   Mute: 0

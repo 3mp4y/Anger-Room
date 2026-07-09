@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 9018178435053945326}
   - component: {fileID: 5172545089698964908}
   m_Layer: 0
-  m_Name: SparaLaser_INvisible
+  m_Name: SparaLaser_Invisble
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

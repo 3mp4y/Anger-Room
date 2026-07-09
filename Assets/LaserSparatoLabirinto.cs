@@ -5,6 +5,7 @@ using UnityEngine;
 public class LaserSparatoLabirinto : MonoBehaviour
 {
     public AudioManager am;
+    [SerializeField] Logger logger;
     public Transform OrigineLaser;
     public float maxLineDistance = 20;
     public LayerMask Player;
@@ -48,6 +49,7 @@ public class LaserSparatoLabirinto : MonoBehaviour
             if (hasHit)
             {
             am.playBad(2);
+            logger.Log(gameObject.name);
             Giocatore.transform.position = new Vector3 (InizioLabirinto.position.x, Giocatore.transform.position.y, InizioLabirinto.position.z);
             }
         }

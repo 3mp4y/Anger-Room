@@ -10,13 +10,14 @@ public class LabyrinthScript : MonoBehaviour
     public Transform newPos;
     [SerializeField] TextMeshPro TMPTimer;
     [SerializeField] TextMeshPro congrats;
-    public float puzzleTimer;
+    [SerializeField] float puzzleTimer;
     private float time_left;
-    private bool started = false;
+    [SerializeField] bool started = false;
     public AudioSource headAudio;
     public GamesManager gm;
     public AudioManager am;
     public bool angerVar;
+    private int level;
     [SerializeField] GameObject[] angerObstacles = new GameObject[3];
    
     // Start is called before the first frame update
@@ -24,6 +25,7 @@ public class LabyrinthScript : MonoBehaviour
     {
         time_left = puzzleTimer;
         congrats.text = string.Format("");
+        level = 1;
     }
 
     public void SetStarted(bool x)
@@ -35,12 +37,11 @@ public class LabyrinthScript : MonoBehaviour
     {
         time_left = puzzleTimer;
         StartCoroutine(DarkenerTeleport(x));
-
     }
     
     public void LastButton()
     {
-        congrats.text = string.Format("Puzzle solved.");
+        congrats.text = string.Format("¡Has ganado!");
         started = false;
         StartCoroutine(DarkenerTeleport(newPos));
         gm.GameWon(2);
@@ -55,7 +56,6 @@ public class LabyrinthScript : MonoBehaviour
         player.transform.position = new Vector3 (pos.transform.position.x, player.transform.position.y, pos.transform.position.z);
         //player.transform.SetPositionAndRotation(new Vector3 (newPos.transform.position.x, player.transform.position.y, newPos.transform.position.z), pos.transform.rotation);
         blacked.SetActive(false);
-        started = true;
     }   
 
     public void SpawnAngerObstacles(int i)
@@ -70,6 +70,15 @@ public class LabyrinthScript : MonoBehaviour
         }
     }
     
+    public void setLevel(int i)
+    {
+        level = i;
+    }
+
+    public void setTimer(float time)
+    {
+        puzzleTimer = time;
+    }
     // Update is called once per frame
     void Update()
     {
@@ -79,13 +88,13 @@ public class LabyrinthScript : MonoBehaviour
         time_left -= Time.deltaTime;
         int minutes = Mathf.FloorToInt(time_left / 60);
         int seconds = Mathf.FloorToInt(time_left % 60);
-        TMPTimer.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+        TMPTimer.text = string.Format("Level: " + level + "\n {0:00}:{1:00}", minutes, seconds);
         if (time_left <= 0)
             {
                 StartCoroutine(DarkenerTeleport(newPos));
                 started = false;
                 TMPTimer.text = string.Format("");
-                time_left = puzzleTimer;
+                puzzleTimer = 90;
                 am.playBad(2);
                 gm.addTries(2, congrats);
             }

@@ -4,8 +4,11 @@ using UnityEngine;
 
 public class ShootScript : MonoBehaviour
 {
+    public AudioManager am;
+    [SerializeField] Logger logger;
     public ParticleSystem smoke;
     public LayerMask mask;
+    public LayerMask endTut;
     public OVRInput.RawButton shootingButton;
     public LineRenderer lineRend;
     public Transform shootingpoiint;
@@ -16,8 +19,6 @@ public class ShootScript : MonoBehaviour
     private float timer;
     public float reloadTime = 1;
     public GunPuzzle gunpuz;
-
-    public AudioManager am;
     public int FailureChance
 {
     get => failureChance;
@@ -58,45 +59,58 @@ public class ShootScript : MonoBehaviour
         am.playShot();
         Ray ray = new Ray(shootingpoiint.position, shootingpoiint.forward); //Inizializzi un laser "ray", position da dove parte il laser, forwward è la direzione BLU
         bool hasHit = Physics.Raycast(ray, out RaycastHit hit, maxLineDistance, mask); //Controlla se il laser ray ha colpito qualcosa entro distanza maxLineDistance e che ha layer "mask", definito da noi a inizio codice
+        bool finishTut = Physics.Raycast(ray, out RaycastHit hit2, maxLineDistance, endTut); //Controlla se il laser ray ha colpito qualcosa entro distanza maxLineDistance e che ha layer "mask", definito da noi a inizio codice
         Vector3 endPoint = Vector3.zero;
-
-        if (hasHit) { //codice dove decidiamo che succede se viene colpito
+        if (gunpuz.GetGunTutorial())
+        {
+            if (finishTut)
+            {
+            endPoint = hit2.point;
+            gunpuz.Endtutorial();
+            }
+            else if (hasHit) 
+            { //codice dove decidiamo che succede se viene colpito
             endPoint = hit.point;
             Target target = hit.transform.GetComponent<Target>();
-
-            if (target)
+            target.OnHit(); 
+            }
+            else
             {
+            endPoint = shootingpoiint.position + shootingpoiint.forward * maxLineDistance;
+            }
+            LineRenderer line = Instantiate(lineRend);
+            line.positionCount = 2;
+            line.SetPosition(0, shootingpoiint.position);
+            line.SetPosition(1, endPoint);   
+            Destroy(line.gameObject, lineTime);
+        }
+        else
+        {
+            if (hasHit) 
+            { //codice dove decidiamo che succede se viene colpito un bersaglio
+            endPoint = hit.point;
+            Target target = hit.transform.GetComponent<Target>();
                 if (Random.Range(0,101) >= failureChance)
                 {
                     target.OnHit();
                     gunpuz.GotHit();
-
+                    logger.Log("Shot - Hit");
                 }
                 else
                 {
-                    am.playBad(1);
+                    logger.Log("Shot - Intentional miss");
+                    if (Random.value < 0.80f) am.playBadSdound(); else am.playBad(1);
                 }
-                
-            } 
-            else
-            {
-                am.playBad(1);
             }
-
+            else
+            {  
+                logger.Log("Shot -  Miss");
+                if (Random.value < 0.80f) am.playBadSdound(); else am.playBad(1);
+                //if (Random.value < 0.80f) {am.playBad(1);} else {}
+                endPoint = shootingpoiint.position + shootingpoiint.forward * maxLineDistance;
+            }
         }
-        else
-        {
-            am.playBad(1);
-            endPoint = shootingpoiint.position + shootingpoiint.forward * maxLineDistance;
-
-        }
-
         
-        LineRenderer line = Instantiate(lineRend);
-        line.positionCount = 2;
-        line.SetPosition(0, shootingpoiint.position);
-        line.SetPosition(1, endPoint);   
-        Destroy(line.gameObject, lineTime);
         
     }
 

@@ -4,18 +4,22 @@ using UnityEngine;
 
 public class AudioManager : MonoBehaviour
 {
+    [SerializeField] Logger logger;
+    
+    public GamesManager gm;
+
     public AudioSource[] games = new AudioSource[3];
     public AudioSource audienceRight;
     public AudioSource audienceLeft;
     public AudioSource presenter;
     public AudioSource clock;
-    public GamesManager gm;
     [SerializeField] bool audioCooldown;
     [SerializeField] AudioClip first_intro;
     [SerializeField] AudioClip[] tutorials = new AudioClip[3];
     [SerializeField] List<AudioClip> presenter_Time_insults;
     [SerializeField] List<AudioClip> presenter_error_insults;
     [SerializeField] List<AudioClip> audience_generci_insults;
+    [SerializeField] List<AudioClip> audience_timed_insults;
     [SerializeField] List<AudioClip> audience_card_insults;
     [SerializeField] List<AudioClip> audience_gun_insults;
     [SerializeField] List<AudioClip> audience_lab_insults;
@@ -47,20 +51,30 @@ public class AudioManager : MonoBehaviour
     }
     private IEnumerator Introduction()
     {
-          Debug.Log("Inizio Intro");
+        Debug.Log("Inizio Intro");
         yield return new WaitForSeconds(3);
         presenter.PlayOneShot(first_intro);
         while (presenter.isPlaying)
             {
                 yield return null;
             }
-          Debug.Log("fine intro");
+        Debug.Log("fine intro");
         gm.StartOverAllTimer();
+    }
+
+    public bool isPresentSpeaking()
+    {
+        return presenter.isPlaying;
     }
     public void playBad(int game)
     {
         games[game].PlayOneShot(bad);
-        StartCoroutine(specific_insult(game));
+        StartCoroutine(specific_insult(game)); 
+    }
+
+    public void playBadSdound()
+    {
+        games[1].PlayOneShot(bad);
     }
 
     public void playLevelUp(int game)
@@ -111,6 +125,9 @@ public class AudioManager : MonoBehaviour
             clip = audience_generci_insults[Random.Range(0, audience_generci_insults.Count)];
             // Randomly choose x or y
             targetSource = (Random.value < 0.5f) ? audienceLeft : audienceRight;
+
+            logger.Log("Generic insult from audience");
+            
         }
         else
         {
@@ -121,6 +138,7 @@ public class AudioManager : MonoBehaviour
             // Pick random clip from B
             targetSource = presenter;
             clip = presenter_Time_insults[Random.Range(0, presenter_Time_insults.Count)];
+            logger.Log("Generic insult from host");
         }
         while (targetSource.isPlaying)
             {
@@ -141,15 +159,10 @@ public class AudioManager : MonoBehaviour
             // Pick random clip from A
         clip = audience_specific_insults[i][Random.Range(0, audience_specific_insults[i].Count)];
             // Randomly choose x or y
-            //AudioSource targetSource = (Random.value < 0.5f) ? audienceLeft : audienceRight;
-        if (Random.value < 0.5f)
-        {
-            targetSource = audienceLeft;
-        }
-        else
-        {
-           targetSource = audienceRight;
-        }
+        targetSource = (Random.value < 0.5f) ? audienceLeft : audienceRight;
+        logger.Log("Specific insult from audience");
+        /*nif (Random.value < 0.5f) {targetSource = audienceLeft;}
+        else { targetSource = audienceRight; } */
         }
         else
         {
@@ -159,6 +172,7 @@ public class AudioManager : MonoBehaviour
             // Pick random clip from B
             targetSource = presenter;
             clip = presenter_error_insults[Random.Range(0, presenter_Time_insults.Count)];
+            logger.Log("Specific insult from host");
         }
 
         while (targetSource.isPlaying)
@@ -170,4 +184,4 @@ public class AudioManager : MonoBehaviour
     }
 
 
-    }
+}
