@@ -5,6 +5,15 @@ TagManager:
   serializedVersion: 2
   tags:
   - Ostacolo
+  - QDSUISharedThemeColor
+  - QDSUIBackplateGradient
+  - QDSUIToggleBorderlessButton
+  - QDSUIPrimaryButton
+  - QDSUIAccentColor
+  - QDSUITextInvertedColor
+  - QDSUITextSecondaryInvertedColor
+  - QDSUISecondaryButton
+  - QDSUIIcon
   layers:
   - Default
   - TransparentFX
@@ -16,7 +25,7 @@ TagManager:
   - Player
   - Floor
   - EndTut
-  - 
+  - Gaze
   - 
   - 
   - 

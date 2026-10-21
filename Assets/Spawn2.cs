@@ -12,15 +12,17 @@ public class Spawn2 : MonoBehaviour
     [SerializeField] private bool started;
     [SerializeField] List<float> _possibleSpawPos = new List<float>();
     private List<GameObject> _spawnedTargets = new List<GameObject>();
-    [SerializeField] float _lastValue = float.MinValue;
+    [SerializeField] private int targetRows = 5;
+    [SerializeField] private int _excludeCount = 1;
+    private List<float> _lastChosen = new List<float>();
     // Start is called before the first frame update
     void Start()
     {
         float increment = 0f;
-        for (int i = 0; i<5; i++)
+        for (int i = 0; i< targetRows; i++)
         {
             _possibleSpawPos.Add(transform.position.y + increment);
-            increment += 1.2f;
+            increment += 1f;
         }
         started = false;
     }
@@ -49,9 +51,12 @@ public class Spawn2 : MonoBehaviour
 
     public float GetRandomTransformYValue()
     {
-    List<float> availableValues = _possibleSpawPos.Where(v => v != _lastValue).ToList();
+    List<float> availableValues = _possibleSpawPos.Where(v => !_lastChosen.Contains(v)).ToList();
     float chosen = availableValues[Random.Range(0, availableValues.Count)];
-    _lastValue = chosen;
+    _lastChosen.Add(chosen);
+    if (_lastChosen.Count > _excludeCount)
+        _lastChosen.RemoveAt(0);
+
     return chosen;
     }
     public void SpawnTarget() {

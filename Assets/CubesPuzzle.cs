@@ -13,6 +13,8 @@ public class CubesPuzzle : MonoBehaviour
     public GameObject[] cards = new GameObject[5];
     [SerializeField] int round = 1;
     [SerializeField] int level = 1;
+    
+    [SerializeField] int failChance;
     //public CountDown counScript;
     private float time_shortening;
     public bool anger_var;
@@ -113,12 +115,13 @@ public class CubesPuzzle : MonoBehaviour
     public void StartPuzzle()
     {
         tutorial = false;
+        failChance = 5;
         CleanCards();
         level_txt.text = string.Format("Nivel \n" + level + "/3" );
         round_txt.text = string.Format("Round \n" + round + "/3");
         StartCards(true);
         isPlaying = true;
-        logger.Log( "Cards are" + solved[0] + solved[1] + solved[2] + solved[3] + solved[4]);
+        logger.Log( "Cards are" + solved[0] + " " + solved[1] + " " + solved[2] + " "  + solved[3] + " " + solved[4]);
     }
 
     public void StartTutorial()
@@ -158,42 +161,67 @@ public class CubesPuzzle : MonoBehaviour
         
     }
 
-    public void ChangeCubeL() { //cambio i primi 3 cubi
+    public void ChangeCubeL() { //cambio i 3 cubi sinistra
         
         if(isPlaying) {
-        Change(0,1,2);
-        StartCoroutine(CheckResutls());
-        logger.Log("Pressed card button left");
-        }
-        if(tutorial) {
-        Change(0,1,2);
-        logger.Log("Tutorial - Pressed card button left");
+            failChance = (failChance<99) ? failChance+1 : failChance;
+            if (Random.Range(0,101) <= failChance)
+            { 
+            logger.Log("Failed to press card button left");
+            return;
+            }
+            Change(0,1,2);
+            if(tutorial) {
+                logger.Log("Tutorial - Pressed card button left");
+            }
+            else
+            {
+            logger.Log("Pressed card button left");
+            StartCoroutine(CheckResutls());
+            }
         }
     }
 
-    public void ChangeCubeR() { //cambio gli ultimi 3 cubi
+
+    public void ChangeCubeR() { //cambio i 3 cubi centrali
         
         if(isPlaying) {
-        Change(2,3,4);
-        StartCoroutine(CheckResutls());
-        logger.Log("Pressed card button right");
-        }
-        if(tutorial) {
-        Change(2,3,4);
-        logger.Log("Tutorial - Pressed card button left");
+            failChance = (failChance<99) ? failChance+1 : failChance;
+            if (Random.Range(0,101) <= failChance)
+            { 
+            logger.Log("Failed to press card button right");
+            return;
+            }
+            Change(2,3,4);
+            if(tutorial) {
+                logger.Log("Tutorial - Pressed card button right");
+            }
+            else
+            {
+            logger.Log("Pressed card button right");
+            StartCoroutine(CheckResutls());
+            }
         }
     }
 
     public void ChangeCubeW() { //cambio i 3 cubi centrali
         
         if(isPlaying) {
-        Change(1,2,3);
-        StartCoroutine(CheckResutls());
-        logger.Log("Pressed card button center");
-        }
-        if(tutorial) {
-        Change(1,2,3);
-        logger.Log("Tutorial - Pressed card button left");
+            failChance = (failChance<99) ? failChance+1 : failChance;
+            if (Random.Range(0,101) <= failChance)
+            { 
+            logger.Log("Failed to press card button center");
+            return;
+            }
+            Change(1,2,3);
+            if(tutorial) {
+                logger.Log("Tutorial - Pressed card button center");
+            }
+            else
+            {
+            logger.Log("Pressed card button center");
+            StartCoroutine(CheckResutls());
+            }
         }
     }
 
@@ -243,10 +271,10 @@ public class CubesPuzzle : MonoBehaviour
                 case 1:
                 case 2: if (round < 3)
                         {
+                            logger.Log("Solved - Round:" + round + " Level:" + level);
                             round++;
                             NextRound();
                             yield return new WaitForSeconds(0.8f);
-                            logger.Log("Solved - Round:" + round + " Level:" + level);
                             StartCards(true);
                         }
                         else
@@ -265,6 +293,7 @@ public class CubesPuzzle : MonoBehaviour
 
                 case 3: if (round < 3)
                         {
+                            logger.Log("Solved - Round:" + round + " Level:" + level);
                             round++;
                             NextRound();
                             yield return new WaitForSeconds(0.6f);
@@ -272,8 +301,8 @@ public class CubesPuzzle : MonoBehaviour
                             Debug.Log(angerChance);
                             if (angerChance > 3 && anger_var)
                             {
-                            logger.Log("AngerCombination - Round:" + round + " Level:" + level);
                             StartCards(false);
+                            logger.Log("AngerCombination");
                             } 
                             else
                             {

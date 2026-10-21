@@ -6,17 +6,18 @@ public class GamesManager : MonoBehaviour
 {
 
     public AudioManager am;
-    [SerializeField] Logger logger;
+    private Logger logger;
+    private ScoreboardManager scoreManager;
     [SerializeField] float timer_experiment;
     [SerializeField] float time_left_exp;
     [SerializeField] TextMeshPro TMPtime_left_exp;
     [SerializeField] TextMeshPro[] scores = new TextMeshPro[3];
-    [SerializeField] TextMeshPro[] scores2 = new TextMeshPro[3];
+    //[SerializeField] TextMeshPro[] scores2 = new TextMeshPro[3];
     private int gmTriesGun = 0;
     private int gmTriesCards = 0;
     private int gmTriesLab = 0;
     [SerializeField] int[] gameTries = {0,0,0};
-
+    [SerializeField] int[] gamePoints = {100, 100, 100};
     [SerializeField] int[] wins = {0,0,0};
     public GameObject[] bulbs= new GameObject[3];
     public Material[] lights = new Material[3];
@@ -24,12 +25,12 @@ public class GamesManager : MonoBehaviour
     [SerializeField] private GameObject[] realButtons= new GameObject[3];
     private List<GameObject> _reactivationBlacklist = new List<GameObject>();
     public List<GameObject> _activationList;
-    
     private Coroutine audioloop;
     private bool isgoing;
     // Start is called before the first frame update
     void Awake() {
         logger = GetComponent<Logger>();
+        scoreManager = GetComponent<ScoreboardManager>();
     }
 
     void Start()
@@ -39,8 +40,7 @@ public class GamesManager : MonoBehaviour
         {
             _activationList.Add(butt);
         }
-        am.PlayIntro();
-        Playing(); //Deactive buttons while the presenter speaks
+        //Playing(); //Deactive buttons while the host speaks
         time_left_exp = timer_experiment;
     }
 
@@ -134,25 +134,30 @@ public class GamesManager : MonoBehaviour
     public void addTries(int i, TextMeshPro message)
     {
         gameTries[i] += 1;
+        gamePoints[i] -= 30;
+        Debug.Log(gamePoints[i]);
+        //scores[i].text = string.Format(gamePoints[i]+"pts");
+        scores[i].text = $"{gamePoints[i]}pts";
         logger.Log("Participant lost game id:" + i + " for the " + gameTries[i] + " time");
         switch(gameTries[i])
         {
             case 1: scores[i].color = new Color32(217, 209, 0, 255);
-                    scores[i].text = string.Format("80pts");
-                    scores2[i].color = new Color(217, 209, 0, 255);
-                    scores2[i].text = string.Format("80pts");
+                    //scores[i].text = string.Format("70pts");
+                    //scores2[i].color = new Color(217, 209, 0, 255);
+                    //scores2[i].text = string.Format("70pts");
                     StartCoroutine(lossMessage(gameTries[i], false, message));
                     break;
             case 2: scores[i].color = new Color32(240, 10, 10, 255);
-                    scores[i].text = string.Format("50pts");
-                    scores2[i].color = new Color32(240, 10, 10, 255);
-                    scores2[i].text = string.Format("50pts");
+                    //scores[i].text = string.Format("50pts");
+                    //scores2[i].color = new Color32(240, 10, 10, 255);
+                    //scores2[i].text = string.Format("50pts");
                     StartCoroutine(lossMessage(gameTries[i], false, message));
                     break;
             case 3: scores[i].color = new Color32(132, 132, 132, 200);
-                    scores[i].text = string.Format("10pts");
-                    scores2[i].color = new Color32(132, 132, 132, 200);
-                    scores2[i].text = string.Format("10pts");
+                    //scores[i].text = string.Format("10pts");
+                    //scores2[i].color = new Color32(132, 132, 132, 200);
+                    //scores2[i].text = string.Format("10pts");
+                    scoreManager.SetPlayerPoints(10);
                     StartCoroutine(lossMessage(gameTries[i], true, message));
                     _reactivationBlacklist.Add(realButtons[i]);
                     break;
@@ -229,7 +234,8 @@ public class GamesManager : MonoBehaviour
 
     public void GameWon(int game)
     {
-        logger.Log("Game  id:" + game + " was won.");
+        scoreManager.SetPlayerPoints(gamePoints[game]);
+        logger.Log("Game  id:" + game + " was won with points" + gamePoints[game]);
         wins[game] = 1;
         _reactivationBlacklist.Add(realButtons[game]);
         if (wins[0] == 1 && wins[1] == 1 && wins[2] == 1)

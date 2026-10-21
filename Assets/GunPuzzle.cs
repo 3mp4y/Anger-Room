@@ -12,7 +12,8 @@ public class GunPuzzle : MonoBehaviour
     public GameObject fakegun;
     [SerializeField] private GameObject parentObject;
     [SerializeField] GameObject endTutorialObject;
-    [SerializeField] GameObject Scores;
+    [SerializeField] List<GameObject> ObjectsToDeactivateWhilePlaying;
+    [SerializeField] GameObject gunLight;
     private List<GameObject> _activeGrandchildren  = new List<GameObject>();
     //Varibales for the timer
     [SerializeField] TextMeshPro TMPTimer;
@@ -47,7 +48,11 @@ public class GunPuzzle : MonoBehaviour
 
     public void Begin()
     {
-        Scores.SetActive(false);
+        foreach (GameObject obj in ObjectsToDeactivateWhilePlaying)
+        {
+            obj.SetActive(false);
+        }
+        gunLight.SetActive(true);
         _activeGrandchildren.Clear();
 
         foreach (Transform child in parentObject.transform)
@@ -65,7 +70,11 @@ public class GunPuzzle : MonoBehaviour
     }
     public void Reset()
     {
-        Scores.SetActive(true);
+        foreach (GameObject obj in ObjectsToDeactivateWhilePlaying)
+        {
+            obj.SetActive(true);
+        }
+        gunLight.SetActive(false);
         foreach (GameObject grandchild in _activeGrandchildren)
         {
             grandchild.SetActive(true);
@@ -73,6 +82,7 @@ public class GunPuzzle : MonoBehaviour
     }
     public void StartGun()
     {   
+        shoot_script.failureChance = angerVar ? 10 : 0;
         Begin();
         fakegun.SetActive(false);
         realgun.SetActive(true);
@@ -82,7 +92,7 @@ public class GunPuzzle : MonoBehaviour
         level = 1;
         time_left = puzzleTimer;
         targetMover.SetSpeeds(0.2f, 0.6f, 2);
-        Spawner.setSpawnTime(1.8f);
+        Spawner.setSpawnTime(1.4f);
         Spawner.StartSpawning();
         TMPScore.text = string.Format("Puntos \n" + hits + "/" + score_to_reach);
         TMPLevel.text = string.Format("Nivel \n" + level + "/3");
@@ -98,7 +108,6 @@ public class GunPuzzle : MonoBehaviour
         TMPLevel.text = string.Format("Nivel");
         TMPTimer.text = string.Format("Tutorial Reloj");
         targetMover.SetSpeeds(0.0f, 0.0f, 1.0f);
-        endTutorialObject.SetActive(true);
         am.playTutorial(1);
         StartCoroutine(Tutorial());
     }
@@ -167,6 +176,7 @@ public class GunPuzzle : MonoBehaviour
                 yield return null;
             }
         Begin();
+        endTutorialObject.SetActive(true);
         realgun.SetActive(true);
         fakegun.SetActive(false);
         Spawner.StartSpawning();
