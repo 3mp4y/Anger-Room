@@ -45,9 +45,9 @@ public class ScoreboardManager : MonoBehaviour
     };
 }
 
-    public void SetPlayerPoints(int points)
+    public void AddPlayerPoints(int points)
     {
-        player.points = points;
+        player.points += points;
         UpdateScoreboard();
     }
 

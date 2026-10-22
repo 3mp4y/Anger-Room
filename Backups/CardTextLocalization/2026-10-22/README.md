@@ -1,0 +1,3 @@
+These are exact copies of `Assets/Card_Minigame.cs`, `Assets/GamesManager.cs`, and their `.meta` files immediately before integrating card text localization on 22 October 2026. `manifest.json` records the original paths and SHA256 hashes. `scene-before.sha256` records the scene hash at that point; this integration does not edit the scene.
+
+Keep this folder outside `Assets`: the C# copies declare the same classes as the active scripts, and their metadata preserves the same GUIDs. To restore the old behavior, copy both scripts back to their recorded original paths with the matching metadata. See `Docs/CardTextLocalization.md` for the Unity setup and rollback steps.

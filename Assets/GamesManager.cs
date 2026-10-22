@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using AngerRoom.Localization;
 using UnityEngine;
 using TMPro;
 public class GamesManager : MonoBehaviour
@@ -133,11 +134,19 @@ public class GamesManager : MonoBehaviour
 
     public void addTries(int i, TextMeshPro message)
     {
+        // Existing minigames keep their current messages until they are migrated.
+        addTries(i, message, null);
+    }
+
+    public void addTries(int i, TextMeshPro message, TextAdapter textAdapter)
+    {
         gameTries[i] += 1;
         gamePoints[i] -= 30;
         Debug.Log(gamePoints[i]);
         //scores[i].text = string.Format(gamePoints[i]+"pts");
-        scores[i].text = $"{gamePoints[i]}pts";
+        scores[i].text = textAdapter != null
+            ? textAdapter.Format(TextId.Points, gamePoints[i])
+            : $"{gamePoints[i]}pts";
         logger.Log("Participant lost game id:" + i + " for the " + gameTries[i] + " time");
         switch(gameTries[i])
         {
@@ -145,20 +154,20 @@ public class GamesManager : MonoBehaviour
                     //scores[i].text = string.Format("70pts");
                     //scores2[i].color = new Color(217, 209, 0, 255);
                     //scores2[i].text = string.Format("70pts");
-                    StartCoroutine(lossMessage(gameTries[i], false, message));
+                    StartCoroutine(lossMessage(gameTries[i], false, message, textAdapter));
                     break;
             case 2: scores[i].color = new Color32(240, 10, 10, 255);
                     //scores[i].text = string.Format("50pts");
                     //scores2[i].color = new Color32(240, 10, 10, 255);
                     //scores2[i].text = string.Format("50pts");
-                    StartCoroutine(lossMessage(gameTries[i], false, message));
+                    StartCoroutine(lossMessage(gameTries[i], false, message, textAdapter));
                     break;
             case 3: scores[i].color = new Color32(132, 132, 132, 200);
                     //scores[i].text = string.Format("10pts");
                     //scores2[i].color = new Color32(132, 132, 132, 200);
                     //scores2[i].text = string.Format("10pts");
                     scoreManager.SetPlayerPoints(10);
-                    StartCoroutine(lossMessage(gameTries[i], true, message));
+                    StartCoroutine(lossMessage(gameTries[i], true, message, textAdapter));
                     _reactivationBlacklist.Add(realButtons[i]);
                     break;
             default: Debug.Log("Ah");
@@ -169,17 +178,22 @@ public class GamesManager : MonoBehaviour
         CheckLost();
     }
 
-     private IEnumerator lossMessage(int tries, bool loss, TextMeshPro message)
+    private IEnumerator lossMessage(int tries, bool loss, TextMeshPro message, TextAdapter textAdapter)
     {
-        if (!loss) {
-        int reamaingTries = 3 - tries;
-        message.text = string.Format("Has fallado :(\nIntentos restantes: " + reamaingTries);
-        yield return new WaitForSeconds(4);
-        message.text = string.Format("");
+        if (!loss)
+        {
+            int remainingTries = 3 - tries;
+            message.text = textAdapter != null
+                ? textAdapter.Format(TextId.AttemptFailed, remainingTries)
+                : $"Has fallado :(\nIntentos restantes: {remainingTries}";
+            yield return new WaitForSeconds(4);
+            message.text = string.Empty;
         }
         else
         {
-        message.text = string.Format("Has fallado!\nJuego desactivado.");
+            message.text = textAdapter != null
+                ? textAdapter.Get(TextId.GameDisabled)
+                : "Has fallado!\nJuego desactivado.";
         }
     }
 
@@ -234,7 +248,7 @@ public class GamesManager : MonoBehaviour
 
     public void GameWon(int game)
     {
-        scoreManager.SetPlayerPoints(gamePoints[game]);
+        scoreManager.AddPlayerPoints(gamePoints[game]);
         logger.Log("Game  id:" + game + " was won with points" + gamePoints[game]);
         wins[game] = 1;
         _reactivationBlacklist.Add(realButtons[game]);

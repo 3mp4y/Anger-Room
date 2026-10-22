@@ -2,12 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.Serialization;
 
 public class CountDown : MonoBehaviour
 {
     [SerializeField] TextMeshPro countd;
     [SerializeField] float time_left;
-    public CubesPuzzle puzz;
+    [FormerlySerializedAs("puzz")]
+    public Card_Minigame cardMinigame;
     bool isPlaying = false;
 
     public GamesManager gm;
@@ -27,8 +29,7 @@ public class CountDown : MonoBehaviour
             {   
                 isPlaying = false;
                 //gm.addTries(0);
-                //puzz.PlaySound();
-                puzz.CleanCards();
+                cardMinigame.ClearCards();
                 countd.text = string.Format("");
             }
         }

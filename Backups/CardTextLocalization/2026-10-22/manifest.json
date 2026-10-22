@@ -1,0 +1,22 @@
+[
+  {
+    "original": "Assets/Card_Minigame.cs",
+    "backup": "Card_Minigame.cs",
+    "sha256": "C038AC326B4BF16CA2DC4C7411106DBA7B9C68BFD7A19952657A95642742561D"
+  },
+  {
+    "original": "Assets/Card_Minigame.cs.meta",
+    "backup": "Card_Minigame.cs.meta",
+    "sha256": "23EB142A3937EF326B421C0E53CF014C065DBEBB79BF552584955797D11F2410"
+  },
+  {
+    "original": "Assets/GamesManager.cs",
+    "backup": "GamesManager.cs",
+    "sha256": "92DDF6548F4CD822226E4A83FEE39133131EC16D8FB6164FA70A3E83B9702E28"
+  },
+  {
+    "original": "Assets/GamesManager.cs.meta",
+    "backup": "GamesManager.cs.meta",
+    "sha256": "E20A1EC37C06BA1942B3887C84A15481BC26E36DC9C154411E40DFA5A88A7E83"
+  }
+]

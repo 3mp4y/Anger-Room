@@ -1,0 +1,117 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a602361394ff4702a112823f8da64992, type: 3}
+  m_Name: GameTexts
+  m_EditorClassIdentifier: 
+  entries:
+  - id: 10
+    english: You won!
+    italian: Hai vinto!
+    spanish: "\xA1Has ganado!"
+  - id: 20
+    english: Level
+    italian: Livello
+    spanish: Nivel
+  - id: 21
+    english: Round
+    italian: Turno
+    spanish: Ronda
+  - id: 22
+    english: Timer
+    italian: Tempo
+    spanish: Reloj
+  - id: 23
+    english: Target score
+    italian: Punteggio da raggiungere
+    spanish: "Puntuaci\xF3n a alcanzar"
+  - id: 24
+    english: Tutorial timer
+    italian: Tempo del tutorial
+    spanish: Reloj del tutorial
+  - id: 30
+    english: 'Level
+
+      {0}/{1}'
+    italian: 'Livello
+
+      {0}/{1}'
+    spanish: 'Nivel
+
+      {0}/{1}'
+  - id: 31
+    english: 'Round
+
+      {0}/{1}'
+    italian: 'Turno
+
+      {0}/{1}'
+    spanish: 'Ronda
+
+      {0}/{1}'
+  - id: 32
+    english: 'Points
+
+      {0}/{1}'
+    italian: 'Punti
+
+      {0}/{1}'
+    spanish: 'Puntos
+
+      {0}/{1}'
+  - id: 33
+    english: 'Next level in...
+
+      {0:00}'
+    italian: 'Prossimo livello tra...
+
+      {0:00}'
+    spanish: 'Siguiente nivel en...
+
+      {0:00}'
+  - id: 34
+    english: 'Level: {0}
+
+      {1:00}:{2:00}'
+    italian: 'Livello: {0}
+
+      {1:00}:{2:00}'
+    spanish: 'Nivel: {0}
+
+      {1:00}:{2:00}'
+  - id: 40
+    english: 'You failed :(
+
+      Attempts remaining: {0}'
+    italian: 'Hai fallito :(
+
+      Tentativi rimasti: {0}'
+    spanish: 'Has fallado :(
+
+      Intentos restantes: {0}'
+  - id: 41
+    english: 'You failed!
+
+      Game disabled.'
+    italian: 'Hai fallito!
+
+      Gioco disattivato.'
+    spanish: 'Has fallado!
+
+      Juego desactivado.'
+  - id: 50
+    english: '{0}pts'
+    italian: '{0}pt'
+    spanish: '{0}pts'
+  - id: 51
+    english: 'Participant {0}: {1}pts - #{2}'
+    italian: 'Partecipante {0}: {1}pt - #{2}'
+    spanish: 'Participante {0}: {1}pts - #{2}'
