@@ -157,7 +157,7 @@ public class GamesManager : MonoBehaviour
                     StartCoroutine(lossMessage(gameTries[i], false, message, textAdapter));
                     break;
             case 2: scores[i].color = new Color32(240, 10, 10, 255);
-                    //scores[i].text = string.Format("50pts");
+                    //scores[i].text = string.Format("40pts");
                     //scores2[i].color = new Color32(240, 10, 10, 255);
                     //scores2[i].text = string.Format("50pts");
                     StartCoroutine(lossMessage(gameTries[i], false, message, textAdapter));
@@ -166,7 +166,7 @@ public class GamesManager : MonoBehaviour
                     //scores[i].text = string.Format("10pts");
                     //scores2[i].color = new Color32(132, 132, 132, 200);
                     //scores2[i].text = string.Format("10pts");
-                    scoreManager.SetPlayerPoints(10);
+                    scoreManager.AddPlayerPoints(10);
                     StartCoroutine(lossMessage(gameTries[i], true, message, textAdapter));
                     _reactivationBlacklist.Add(realButtons[i]);
                     break;
