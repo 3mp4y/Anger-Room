@@ -37,6 +37,10 @@ MonoBehaviour:
     english: Tutorial timer
     italian: Tempo del tutorial
     spanish: Reloj del tutorial
+  - id: 25
+    english: "End\nTutorial"
+    italian: "Termina\nil tutorial"
+    spanish: "Finalizar\ntutorial"
   - id: 30
     english: 'Level
 

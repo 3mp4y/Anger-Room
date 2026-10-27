@@ -148554,6 +148554,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   am: {fileID: 325308306}
+  textAdapter: {fileID: 325308309}
   logger: {fileID: 1898069416}
   realgun: {fileID: 1622301315}
   fakegun: {fileID: 369846009}
@@ -148567,8 +148568,8 @@ MonoBehaviour:
   TMPTimer: {fileID: 919318971}
   TMPLevel: {fileID: 789623827}
   TMPScore: {fileID: 1864112861}
+  endTutorialText: {fileID: 882911831}
   puzzleTimer: 21
-  targetMover: {fileID: 6616958429567563539, guid: 40e11cd915233cf448a9641d877fc0fc, type: 3}
   hits: 0
   gm: {fileID: 1898069414}
   Spawner: {fileID: 1979904438}

@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using AngerRoom.Localization;
 using UnityEngine;
 using TMPro;
 public class GunPuzzle : MonoBehaviour
 {
 
     public AudioManager am;
+    [Tooltip("The shared TextAdapter on the AudioManager object.")]
+    [SerializeField] private TextAdapter textAdapter;
     [SerializeField] Logger logger;
     //Variables for gun and controller models
     public GameObject realgun;
@@ -19,10 +22,11 @@ public class GunPuzzle : MonoBehaviour
     [SerializeField] TextMeshPro TMPTimer;
     [SerializeField] TextMeshPro TMPLevel;
     [SerializeField] TextMeshPro TMPScore;
+    [Tooltip("The Text (TMP) child of EndTut, including when EndTut is inactive.")]
+    [SerializeField] private TMP_Text endTutorialText;
     public float puzzleTimer;
     private float time_left;
     private bool started;
-    public TargetMover targetMover;
     [SerializeField] private int hits;
     private int level;
     public GamesManager gm;
@@ -43,6 +47,7 @@ public class GunPuzzle : MonoBehaviour
         TMPScore.text = string.Format("");
         TMPLevel.text = string.Format("");
         TMPTimer.text = string.Format("");
+        endTutorialText.text = textAdapter.Get(TextId.EndTutorial);
         shoot_script.failureChance = angerVar ? 10 : 0; 
     }
 
@@ -91,23 +96,49 @@ public class GunPuzzle : MonoBehaviour
         hits = 0;
         level = 1;
         time_left = puzzleTimer;
-        targetMover.SetSpeeds(0.2f, 0.6f, 2);
+        ConfigureTargetMovementForCurrentLevel();
         Spawner.setSpawnTime(1.4f);
         Spawner.StartSpawning();
-        TMPScore.text = string.Format("Puntos \n" + hits + "/" + score_to_reach);
-        TMPLevel.text = string.Format("Nivel \n" + level + "/3");
+        TMPScore.text = textAdapter.Format(TextId.ScoreProgress, hits, score_to_reach);
+        TMPLevel.text = textAdapter.Format(TextId.LevelProgress, level, 3);
     }
 
+
+    private void ConfigureTargetMovementForCurrentLevel()
+    {
+        // Movement ownership:
+        // 1. GunPuzzle chooses settings for the current level.
+        // 2. Spawn2 remembers them for targets it will create next.
+        // 3. Spawn2 applies them to each NEW target's TargetMover component.
+        // We never modify the TargetMover on the prefab asset itself.
+        //
+        // Calculate from the level number, not from a previous target's values.
+        // This makes a retry start at level-one speeds even after a tutorial
+        // or a previous attempt reached level three. The original progression is:
+        // Level 1: 0.2-0.6 units/sec, new speed every 2 seconds.
+        // Level 2: 0.6-1.5 units/sec, new speed every 0.8 seconds.
+        // Level 3: 1.0-2.4 units/sec, new speed every 0.32 seconds.
+        int completedLevels = level - 1;
+        float minimumSpeed = 0.2f + completedLevels * 0.4f;
+        float maximumSpeed = 0.6f + completedLevels * 0.9f;
+        float speedChangeInterval = 2f * Mathf.Pow(0.4f, completedLevels);
+
+        // Configure BEFORE StartSpawning. Existing targets keep their own values;
+        // the level transition already clears them before starting the next level.
+        Spawner.ConfigureMovement(minimumSpeed, maximumSpeed, speedChangeInterval);
+    }
 
     public void StartTutorial2()
     {
         tutorial = true;
         gm.DoneTutorial(1);
         gm.Playing();
-        TMPScore.text = string.Format("Puntuación a alcanzar");
-        TMPLevel.text = string.Format("Nivel");
-        TMPTimer.text = string.Format("Tutorial Reloj");
-        targetMover.SetSpeeds(0.0f, 0.0f, 1.0f);
+        TMPScore.text = textAdapter.Get(TextId.TargetScoreLabel);
+        TMPLevel.text = textAdapter.Get(TextId.LevelLabel);
+        TMPTimer.text = textAdapter.Get(TextId.TutorialTimerLabel);
+        // Both conditions use stationary practice targets. These settings apply
+        // to new tutorial targets only; StartGun replaces them for level one.
+        Spawner.ConfigureMovement(0.0f, 0.0f, 1.0f);
         am.playTutorial(1);
         StartCoroutine(Tutorial());
     }
@@ -133,7 +164,7 @@ public class GunPuzzle : MonoBehaviour
                 Spawner.StopSpawning();
                 TMPScore.text = string.Format("");
                 TMPLevel.text = string.Format("");
-                gm.addTries(1, TMPTimer);
+                gm.addTries(1, TMPTimer, textAdapter);
                 am.playBad(1);
             }
       
@@ -207,7 +238,7 @@ public class GunPuzzle : MonoBehaviour
     if (!tutorial)
         {
         hits++;
-        TMPScore.text = string.Format("Puntos \n" + hits + "/" + score_to_reach);
+        TMPScore.text = textAdapter.Format(TextId.ScoreProgress, hits, score_to_reach);
         if (hits >= score_to_reach) {
             started = false;
             Spawner.StopSpawning();
@@ -217,20 +248,20 @@ public class GunPuzzle : MonoBehaviour
                 am.playLevelUp(1);
                 hits = 0;
                 level++;
-                TMPLevel.text = string.Format("Nivel \n" + level + "/3");
-                TMPScore.text = string.Format("Puntos \n" + hits + "/" + score_to_reach);
+                TMPLevel.text = textAdapter.Format(TextId.LevelProgress, level, 3);
+                TMPScore.text = textAdapter.Format(TextId.ScoreProgress, hits, score_to_reach);
                 float timeLevelUp = 3.9f;
                 while (timeLevelUp > 0.2f)
                     {
                     timeLevelUp -= Time.deltaTime;
                     int seconds = Mathf.FloorToInt(timeLevelUp % 60);
-                    TMPTimer.text = string.Format("Next level in... \n" + "{0:00}", seconds);
+                    TMPTimer.text = textAdapter.Format(TextId.NextLevelCountdown, seconds);
                     yield return null;
                     }
-                targetMover.SetSpeeds(targetMover.getMin() + 0.4f, targetMover.getMax() + 0.9f, targetMover.getInt() * 0.4f);
+                ConfigureTargetMovementForCurrentLevel();
                 time_left = 21;
                 if (angerVar) {shoot_script.failureChance += 20;}                  
-                TMPScore.text = string.Format("Puntos \n" + hits + "/" + score_to_reach);
+                TMPScore.text = textAdapter.Format(TextId.ScoreProgress, hits, score_to_reach);
                 Spawner.StartSpawning();
                 started = true;
                 }
@@ -240,7 +271,7 @@ public class GunPuzzle : MonoBehaviour
                 gm.stoppedPlaying();
                 started = false;
                 time_left = puzzleTimer;
-                TMPTimer.text = string.Format("¡Has ganado!");
+                TMPTimer.text = textAdapter.Get(TextId.Victory);
                 fakegun.SetActive(true);
                 realgun.SetActive(false);
                 Reset();

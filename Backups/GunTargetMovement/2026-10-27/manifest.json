@@ -1,0 +1,47 @@
+[
+  {
+    "original": "Assets/GunPuzzle.cs",
+    "backup": "Backups\\GunTargetMovement\\2026-10-27\\Assets\\GunPuzzle.cs",
+    "sha256": "8C30F66AAC899CB47A8F414B5FFAEEEFB2E63BB0F69A93A5B2F1EEF7BC6EC387"
+  },
+  {
+    "original": "Assets/GunPuzzle.cs.meta",
+    "backup": "Backups\\GunTargetMovement\\2026-10-27\\Assets\\GunPuzzle.cs.meta",
+    "sha256": "B097941473E4C88E4CC8EA32E818F2D0C4806B8A0509A164905A2AD07B0B292A"
+  },
+  {
+    "original": "Assets/Spawn2.cs",
+    "backup": "Backups\\GunTargetMovement\\2026-10-27\\Assets\\Spawn2.cs",
+    "sha256": "202FE3C78E0D7B279B0F03F01E79A6AFD2D895B2A2986FA189E945868337BE7C"
+  },
+  {
+    "original": "Assets/Spawn2.cs.meta",
+    "backup": "Backups\\GunTargetMovement\\2026-10-27\\Assets\\Spawn2.cs.meta",
+    "sha256": "04A7E0E3C7955AF212558DCBFE9C6FAEC41E931CEFAA9C8B4866A45447C0CA34"
+  },
+  {
+    "original": "Assets/TargetMover.cs",
+    "backup": "Backups\\GunTargetMovement\\2026-10-27\\Assets\\TargetMover.cs",
+    "sha256": "0CB146D9F0688CC4E8077026CF11E5D0ED8B9FC67ECA21BC9887622A0BF07646"
+  },
+  {
+    "original": "Assets/TargetMover.cs.meta",
+    "backup": "Backups\\GunTargetMovement\\2026-10-27\\Assets\\TargetMover.cs.meta",
+    "sha256": "30081AC39A775AEFA22D13688FB0587010594A920770F6ACB5AB698CB6A55D9D"
+  },
+  {
+    "original": "Assets/Plugins/Scenes/AngerRoom.unity",
+    "backup": "Backups\\GunTargetMovement\\2026-10-27\\Assets\\Plugins\\Scenes\\AngerRoom.unity",
+    "sha256": "C41C88A7293FECBA61E9E6B5EE3738A7CBBCFA0375B810C570556A6947CC5F14"
+  },
+  {
+    "original": "Assets/Plugins/Scenes/AngerRoom.unity.meta",
+    "backup": "Backups\\GunTargetMovement\\2026-10-27\\Assets\\Plugins\\Scenes\\AngerRoom.unity.meta",
+    "sha256": "1D61AFF4BE60CF496493E6B087F6589E02B4AD02231640C76EC1542ABFC61B5E"
+  },
+  {
+    "original": "Docs/GunMinigameLocalizationAndReview.md",
+    "backup": "Backups\\GunTargetMovement\\2026-10-27\\Docs\\GunMinigameLocalizationAndReview.md",
+    "sha256": "41CDE6955D51842342F6D52241649B2AEC12C08E14465C5304C06DDB67DF0936"
+  }
+]

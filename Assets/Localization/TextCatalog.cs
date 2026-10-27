@@ -56,6 +56,8 @@ namespace AngerRoom.Localization
                 "Target score", "Punteggio da raggiungere", "Puntuación a alcanzar"),
             new Entry(TextId.TutorialTimerLabel,
                 "Tutorial timer", "Tempo del tutorial", "Reloj del tutorial"),
+            new Entry(TextId.EndTutorial,
+                "End\nTutorial", "Termina\nil tutorial", "Finalizar\ntutorial"),
             new Entry(TextId.LevelProgress,
                 "Level\n{0}/{1}", "Livello\n{0}/{1}", "Nivel\n{0}/{1}"),
             new Entry(TextId.RoundProgress,

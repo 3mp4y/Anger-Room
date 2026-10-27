@@ -6,6 +6,13 @@ using UnityEngine.Serialization;
 
 public class Card_Minigame : MonoBehaviour
 {
+    private enum CardGameState
+    {
+        Idle,
+        Tutorial,
+        Playing
+    }
+
     private const int GameIndex = 0;
     private const int CardCount = 5;
     private const int RoundsPerLevel = 3;
@@ -56,12 +63,10 @@ public class Card_Minigame : MonoBehaviour
     [SerializeField] private int inputFailureChance;
     [FormerlySerializedAs("time_left")]
     [SerializeField] private float timeRemaining;
-    [FormerlySerializedAs("tutorial")]
-    [SerializeField] private bool isTutorial;
 
     private bool[] cardFacesUp = new bool[CardCount];
     private float timeReduction;
-    private bool isPlaying;
+    private CardGameState state = CardGameState.Idle;
 
     private readonly bool[][] solvableConfigurations =
     {
@@ -87,7 +92,7 @@ public class Card_Minigame : MonoBehaviour
 
     private void Update()
     {
-        if (!isPlaying)
+        if (state != CardGameState.Playing)
         {
             return;
         }
@@ -102,7 +107,6 @@ public class Card_Minigame : MonoBehaviour
         }
         else
         {
-            isPlaying = false;
             ClearCards();
             gamesManager.addTries(GameIndex, timerText, textAdapter);
             audioManager.playBad(GameIndex);
@@ -124,6 +128,9 @@ public class Card_Minigame : MonoBehaviour
 
     public void ClearCards()
     {
+        // A pending round transition must not restore cards after this reset.
+        StopAllCoroutines();
+        state = CardGameState.Idle;
         cardFacesUp = new bool[CardCount];
         currentLevel = 1;
         currentRound = 1;
@@ -149,18 +156,19 @@ public class Card_Minigame : MonoBehaviour
     // Public methods are entry points for the buttons wired in the Unity Inspector.
     public void StartMinigame()
     {
-        isTutorial = false;
         inputFailureChance = InitialFailureChance;
         ClearCards();
         levelText.text = textAdapter.Format(TextId.LevelProgress, currentLevel, LevelCount);
         roundText.text = textAdapter.Format(TextId.RoundProgress, currentRound, RoundsPerLevel);
         StartRound(true);
-        isPlaying = true;
+        state = CardGameState.Playing;
         logger.Log("Cards are" + string.Join(" ", cardFacesUp));
     }
 
     public void StartTutorial()
     {
+        ClearCards();
+        state = CardGameState.Tutorial;
         audioManager.playTutorial(GameIndex);
         gamesManager.DoneTutorial(GameIndex);
         gamesManager.Playing();
@@ -210,12 +218,13 @@ public class Card_Minigame : MonoBehaviour
 
     private void TryFlipCards(int first, int second, int third, string buttonName)
     {
-        if (!isPlaying)
+        if (state == CardGameState.Idle)
         {
             return;
         }
 
-        if (ShouldIgnorePress())
+        // Practice always responds to input, even in an anger-enabled game.
+        if (state == CardGameState.Playing && ShouldIgnorePress())
         {
             logger.Log($"Failed to press card button {buttonName}");
             return;
@@ -226,7 +235,7 @@ public class Card_Minigame : MonoBehaviour
         cardFacesUp[third] = !cardFacesUp[third];
         UpdateCardVisuals();
 
-        if (isTutorial)
+        if (state == CardGameState.Tutorial)
         {
             logger.Log($"Tutorial - Pressed card button {buttonName}");
         }
@@ -295,7 +304,7 @@ public class Card_Minigame : MonoBehaviour
 
     private IEnumerator CheckResults()
     {
-        if (!AreAllCardsFaceUp())
+        if (state != CardGameState.Playing || !AreAllCardsFaceUp())
         {
             yield break;
         }
@@ -315,7 +324,7 @@ public class Card_Minigame : MonoBehaviour
                 else
                 {
                     currentRound = 1;
-                    currentLevel++;
+                    currentLevel += 3;
                     StartCoroutine(ShowLevelTransition());
                     yield return new WaitForSeconds(4.1f);
                     timeReduction += TimeReductionPerLevel;
@@ -345,7 +354,7 @@ public class Card_Minigame : MonoBehaviour
                 }
                 else
                 {
-                    isPlaying = false;
+                    state = CardGameState.Idle;
                     timerText.text = textAdapter.Get(TextId.Victory);
                     levelText.text = string.Empty;
                     roundText.text = string.Empty;

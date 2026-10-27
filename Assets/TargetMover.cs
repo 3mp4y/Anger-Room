@@ -20,7 +20,10 @@ public class TargetMover : MonoBehaviour
 
     private void Start()
     {
-        // Pick an initial speed immediately on spawn
+        // Spawn2 configures this instance immediately after Instantiate, before
+        // Start runs. Pick the first speed from those supplied settings. Keeping
+        // this initialization in Start (not Awake) allows the spawner to supply
+        // them first. Standalone targets can still use their Inspector values.
         _currentSpeed = Random.Range(minSpeed, maxSpeed);
         if (Random.Range(0,101) > 50)
         {
@@ -46,12 +49,18 @@ public class TargetMover : MonoBehaviour
             _timeSinceSpeedChange = 0f;
         }
 
-        // Move along local Z axis
+        // Move along local X, keeping the direction chosen at startup.
         transform.Translate(Vector3.right * _currentSpeed * direction * Time.deltaTime, Space.Self);
     }
 
     public void SetSpeeds(float min, float max, float interval)
     {
+        // Store settings on THIS target instance. Spawn2 calls this once before
+        // Start; we do not consult the prefab or spawner again during movement.
+        // Later spawner configuration changes therefore affect only new targets.
+        // If another caller reconfigures a live target, its current speed lasts
+        // until the next speed randomization; this method only changes the range
+        // and interval. GunPuzzle no longer calls this on the prefab asset.
         minSpeed = min;
         maxSpeed = max;
         speedChangeInterval = interval;

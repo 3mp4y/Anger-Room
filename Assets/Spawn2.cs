@@ -15,6 +15,22 @@ public class Spawn2 : MonoBehaviour
     [SerializeField] private int targetRows = 5;
     [SerializeField] private int _excludeCount = 1;
     private List<float> _lastChosen = new List<float>();
+
+    // Runtime settings for FUTURE targets, supplied by GunPuzzle before spawning.
+    // They belong to this spawner, not to the shared target prefab. Changing them
+    // does not alter targets that are already alive: each target owns its copy.
+    private float minimumTargetSpeed;
+    private float maximumTargetSpeed;
+    private float targetSpeedChangeInterval;
+    private bool hasMovementConfiguration;
+
+    public void ConfigureMovement(float minimumSpeed, float maximumSpeed, float speedChangeInterval)
+    {
+        minimumTargetSpeed = minimumSpeed;
+        maximumTargetSpeed = maximumSpeed;
+        targetSpeedChangeInterval = speedChangeInterval;
+        hasMovementConfiguration = true;
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -60,9 +76,33 @@ public class Spawn2 : MonoBehaviour
     return chosen;
     }
     public void SpawnTarget() {
+        // Require an explicit choice of tutorial/level settings. Otherwise a
+        // forgotten setup call could silently use unrelated prefab defaults.
+        if (!hasMovementConfiguration)
+        {
+            Debug.LogError("Call ConfigureMovement before spawning gun targets.", this);
+            StopSpawning();
+            return;
+        }
+
         //Vector3 spawnPos = new Vector3(transform.position.x, transform.position.y + Random.Range(-1.5f, 1.5f), transform.position.z);
         Vector3 spawnPos = new Vector3(transform.position.x, GetRandomTransformYValue(), transform.position.z);
         GameObject instance = Instantiate(target, spawnPos, Quaternion.identity);
+        // IMPORTANT: GetComponent is called on INSTANCE, not on target (the
+        // prefab). Only this newly created object's movement values are changed.
+        TargetMover mover = instance.GetComponent<TargetMover>();
+        if (mover == null)
+        {
+            Debug.LogError("The gun target prefab needs a TargetMover on its root object.", this);
+            Destroy(instance);
+            StopSpawning();
+            return;
+        }
+
+        // Instantiate has run Awake/OnEnable, but TargetMover initializes motion
+        // in Start, before its first Update. Supply its settings now so even its
+        // FIRST randomly chosen speed uses the current tutorial/level range.
+        mover.SetSpeeds(minimumTargetSpeed, maximumTargetSpeed, targetSpeedChangeInterval);
         _spawnedTargets.Add(instance);
     }
 

@@ -1,0 +1,52 @@
+[
+  {
+    "original": "Assets/GunPuzzle.cs",
+    "backup": "Backups\\GunTextLocalization\\2026-10-26\\Assets\\GunPuzzle.cs",
+    "sha256": "7559B4775D5D2F6E1398C494499371B286E6275AE08A0B6264D72849357584C6"
+  },
+  {
+    "original": "Assets/GunPuzzle.cs.meta",
+    "backup": "Backups\\GunTextLocalization\\2026-10-26\\Assets\\GunPuzzle.cs.meta",
+    "sha256": "B097941473E4C88E4CC8EA32E818F2D0C4806B8A0509A164905A2AD07B0B292A"
+  },
+  {
+    "original": "Assets/Localization/TextId.cs",
+    "backup": "Backups\\GunTextLocalization\\2026-10-26\\Assets\\Localization\\TextId.cs",
+    "sha256": "7F98536EC02CB2F762CD93A80B73EF5B39AAB58A6F802484DC13D44813EE9887"
+  },
+  {
+    "original": "Assets/Localization/TextId.cs.meta",
+    "backup": "Backups\\GunTextLocalization\\2026-10-26\\Assets\\Localization\\TextId.cs.meta",
+    "sha256": "6D086267B98A84BB145F2397FFDA4F4AEDE1C14FB0275285BDC89283C7AE53E3"
+  },
+  {
+    "original": "Assets/Localization/TextCatalog.cs",
+    "backup": "Backups\\GunTextLocalization\\2026-10-26\\Assets\\Localization\\TextCatalog.cs",
+    "sha256": "5E204E75649ED66B6468A8956BEA3C5CD0964D2233856D8DC485CD3771D31ECE"
+  },
+  {
+    "original": "Assets/Localization/TextCatalog.cs.meta",
+    "backup": "Backups\\GunTextLocalization\\2026-10-26\\Assets\\Localization\\TextCatalog.cs.meta",
+    "sha256": "2130B9BC68C0CF7F9E62896C1A2A8CF9208B2B3260E67BE15B0DAC10BB0CE081"
+  },
+  {
+    "original": "Assets/Localization/GameTexts.asset",
+    "backup": "Backups\\GunTextLocalization\\2026-10-26\\Assets\\Localization\\GameTexts.asset",
+    "sha256": "66C11CF67BFA533D2DBC5FC158740518FD5D8A5B86C160FA307A6BBF92EC7DAC"
+  },
+  {
+    "original": "Assets/Localization/GameTexts.asset.meta",
+    "backup": "Backups\\GunTextLocalization\\2026-10-26\\Assets\\Localization\\GameTexts.asset.meta",
+    "sha256": "A95CBA94D31E20A79FDA2415893668E9ECACDDC97B6225E7D3DC3BAE5880CC2E"
+  },
+  {
+    "original": "Assets/Plugins/Scenes/AngerRoom.unity",
+    "backup": "Backups\\GunTextLocalization\\2026-10-26\\Assets\\Plugins\\Scenes\\AngerRoom.unity",
+    "sha256": "F76296D32B2390164B838F432319DA695627CD022100F1D52BA548C94C14586E"
+  },
+  {
+    "original": "Assets/Plugins/Scenes/AngerRoom.unity.meta",
+    "backup": "Backups\\GunTextLocalization\\2026-10-26\\Assets\\Plugins\\Scenes\\AngerRoom.unity.meta",
+    "sha256": "1D61AFF4BE60CF496493E6B087F6589E02B4AD02231640C76EC1542ABFC61B5E"
+  }
+]

@@ -14,6 +14,7 @@ namespace AngerRoom.Localization
         TimerLabel = 22,
         TargetScoreLabel = 23,
         TutorialTimerLabel = 24,
+        EndTutorial = 25,
 
         // Placeholder contracts: every translation must use the same arguments.
         LevelProgress = 30,       // {0} current level, {1} level count
