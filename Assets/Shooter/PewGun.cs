@@ -119,9 +119,13 @@ public class PewGun : MonoBehaviour
             Target target = hit.collider.GetComponent<Target>();
             if (target != null)
             {
-                target.OnHit();
-                GameManager.Instance.RegisterHit();
-                hitTarget = true;
+                // Keep this older shooting implementation consistent with Target:
+                // rejected duplicate calls must not award another hit.
+                if (target.TryHit())
+                {
+                    GameManager.Instance.RegisterHit();
+                    hitTarget = true;
+                }
             }
             else
             {

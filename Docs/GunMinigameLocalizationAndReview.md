@@ -1,6 +1,6 @@
 The gun minigame now uses the same session language and text catalogue as the card minigame. Its timer, level, score, tutorial labels, transition countdown, victory and failure messages are localized. The child text under `EndTut` is also localized. Language remains fixed for each Play session.
 
-The localization and explicit movement configuration for each spawned target are implemented. The other gameplay changes below remain review topics. Firing between levels and the current EndTut raycasts are intentionally retained: the room layout prevents the target overlap described in the original review. The shared anger control and insult audio remain pending your review.
+Localization, movement configuration, guarded hit acceptance and independent hit-audio playback are implemented. Remaining suggestions below are review topics. Firing between levels and the current EndTut raycasts are intentionally retained: the room layout prevents the target overlap described in the original review. Shared anger control and insult gating are implemented; see InsultConditions.md. The shot-failure percentage correction is also implemented.
 
 **Unity setup and checks**
 
@@ -38,11 +38,9 @@ The saved scene uses `GunPuzzle.cs`, `ShootScript.cs`, `Spawn2.cs`, and `TargetM
 
 The older `Shooter/PewGun.cs`, `Shooter/TargetSpawner.cs` and `Shooter/GameManager.cs` form another implementation. Their script GUIDs were not found in the saved scenes or prefabs searched. They are not the implementation wired to this minigame. Keep them preserved, but clearly identify them as legacy so future work does not accidentally modify the wrong system.
 
-**Fix first: spawning resumes after victory**
+**Victory spawning restart removed by the user**
 
-In `GunPuzzle.CoroutineHit()`, the victory branch hides the real gun and displays the victory text, then calls `Spawner.StartSpawning()`. That starts new targets after the game is over. This behavior was also reproduced with the real GunPuzzle code in the isolated checks.
-
-The proposed fix is to finish in an idle/completed state with spawning stopped and targets cleared. Put that cleanup in one completion method shared by the appropriate exit paths. A completed activity should not retain a background spawning process.
+The victory branch no longer calls StartSpawning. CoroutineHit already stops spawning and clears targets before deciding whether to advance to another level or finish. No additional stop call is needed in the victory branch.
 
 **Make the gun's activity state explicit**
 
@@ -60,17 +58,25 @@ Use one raycast covering the intended hittable objects and any objects that shou
 
 The target lookup also assumes `hit.transform.GetComponent<Target>()` succeeds. A collider on the target layer but without that component on the same GameObject causes a null reference. Resolve the Target on the collider or an appropriate parent, check the result, and handle a non-target collider deliberately. The current target root has both the Target component and a collider; this recommendation protects against changes to prefab hierarchies and layers.
 
-**Make a hit a single accepted action**
+**Guarded hit acceptance and independent hit audio implemented**
 
-`Target` declares `_hasBeenHit` but never uses it. Its `OnHit()` has no guard against repeated calls. A `TryHit()` method that marks the target hit and returns whether this was the first accepted hit would let ShootScript award credit exactly once. Disable the collider immediately on acceptance, then perform effects and cleanup. This matters because destruction is deferred, and other callers can otherwise report the same target before it disappears.
+Target.TryHit returns true only for the first accepted hit. It sets _hasBeenHit before producing any effects, disables all colliders on the target and its children, requests sound/VFX, and schedules destruction. Repeated calls return false without repeating those operations. Disabling colliders protects subsequent physics queries; the boolean also protects direct calls before Unity completes destruction.
 
-`Target.OnHit()` also plays the hit sound on the target's own AudioSource and immediately destroys that object. The sound can be cut off with its source. A separate sound-emitter object or shared effects player should own the sound for its duration. If a hit VFX prefab is assigned later, give that effect its own cleanup policy too. The currently assigned target has a hit sound but no hit VFX prefab.
+ShootScript awards a point and logs a successful hit only when TryHit returns true. Tutorial shots use the same guard but do not award points. An intentionally failed shot never calls TryHit, so it leaves the target available for a later shot. Both paths safely skip a collider without a Target component. The older PewGun caller also checks the return value before registering a hit. Target.OnHit remains as a void wrapper for compatibility with existing UnityEvents; callers that award points must use TryHit.
 
-**Use a true percentage for shot failures**
+With the current single gun and 1.1-second cooldown, normal firing could not double-hit an already destroyed target. This guard is defensive protection for multiple callers in one frame and an example of the target owning its own state. Checking only inside Target without checking the result in the shooter would prevent duplicate effects but still allow duplicate score increments.
 
-`Random.Range(0, 101)` provides 101 possible integers, including 100. The current success test is `roll >= failureChance`. At a configured failureChance of 100, a roll of 100 still succeeds, so 100 does not mean a guaranteed failure. At 10, the failure probability is 10/101 rather than exactly 10%.
+Hit audio now uses AudioSource.PlayClipAtPoint at the target's position. Unity creates an independent temporary source and removes it after playback, so target destruction or ClearTargets no longer destroys the hit-sound source. Existing Hit Sound assignments remain in use. The old target AudioSource is retained as the volume setting: its volume is passed through, with a fallback of 1 if no source exists. Other audio settings are not copied. The old prefab source was 2D, so the new positional sound may be quieter with distance; test it from the player's actual shooting position in the headset. No new Inspector references are required.
 
-A clearer contract is a roll from 0 to 99 and a failure when the roll is less than the configured percentage. Then 0 means never fail and 100 means always fail. This would intentionally adjust existing probabilities and belongs in the later anger-mechanics review, not this localization change.
+The actual project compiled with zero errors. Twenty-one isolated checks using the real Target and ShootScript sources verified repeated calls, single scoring/logging/effects, tutorial handling, collider disabling, missing clips/sources, preserved volume, and an intentional failure followed by an accepted hit. Engine doubles leave destruction deferred to exercise same-frame calls. These checks do not verify Unity audio playback or VR physics.
+
+The edited source files, metadata and this review were preserved in Backups/TargetHitHandling/2026-10-27 with a SHA256 manifest. The user's victory-spawning removal and 93-second labyrinth retry timer were left intact.
+
+**Shot failures now use a true percentage**
+
+The old `Random.Range(0, 101)` provided 101 possible integers. ShootScript now uses `Random.Range(0, 100)`, producing 0 through 99, and retains the success test `roll >= failureChance`. A configured 10 means ten failure outcomes out of one hundred; 0 never deliberately fails and 100 always deliberately fails.
+
+This correction applies to the deliberate failure of a shot that has hit a target during real gameplay. Ordinary geometric misses, tutorial hits, and the configured level percentages are unchanged.
 
 `ShootScript.FailureChance` already clamps values, but GunPuzzle writes directly to the public `failureChance` field, bypassing the property. Keep the backing field private and serialized, and route runtime changes through the property or a configuration method. This is encapsulation: one place owns the rule that the value must stay between 0 and 100.
 
@@ -109,7 +115,7 @@ Destroyed targets remain in `_spawnedTargets` until `ClearTargets()`. Remove exp
 - Use descriptive names and PascalCase public methods, such as `TargetSpawner`, `ShotOrigin`, `EndTutorial`, and `SetSpawnInterval`. Preserve serialized field names with migration attributes and update UnityEvent bindings if renaming methods. Avoid a broad rename until behavior is covered by tests.
 - Remove duplicated imports, obsolete commented implementations and unused fields from active scripts after preserving their old versions. `Target.scoreValue` is currently unused; the game counts accepted hits instead. Make that scoring contract explicit.
 
-The victory spawning restart is confirmed unwanted and remains a separate pending fix. State restructuring and the EndTut raycast change are not required for the intended between-level shooting behavior and current layout. Row validation and hit handling remain proposals; probability changes can wait for the planned anger-condition work.
+The victory spawning restart has been removed by the user. State restructuring and the EndTut raycast change are not required for the intended between-level shooting behavior and current layout. Row validation remains a proposal. Hit handling and the percentage calculation are implemented.
 
 **Validation and preserved files**
 

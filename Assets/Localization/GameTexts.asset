@@ -41,6 +41,14 @@ MonoBehaviour:
     english: "End\nTutorial"
     italian: "Termina\nil tutorial"
     spanish: "Finalizar\ntutorial"
+  - id: 26
+    english: Tutorial
+    italian: Tutorial
+    spanish: Tutorial
+  - id: 27
+    english: Start
+    italian: Inizia
+    spanish: Empezar
   - id: 30
     english: 'Level
 
@@ -91,6 +99,10 @@ MonoBehaviour:
     spanish: 'Nivel: {0}
 
       {1:00}:{2:00}'
+  - id: 35
+    english: 'Level {0}'
+    italian: 'Livello {0}'
+    spanish: 'Nivel {0}'
   - id: 40
     english: 'You failed :(
 

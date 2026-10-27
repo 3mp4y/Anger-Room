@@ -35,6 +35,8 @@ public class Card_Minigame : MonoBehaviour
     [FormerlySerializedAs("anger_var")]
     [Tooltip("Allows ignored button presses and unsolvable configurations in later rounds.")]
     [SerializeField] private bool angerEnabled;
+    // GameConditions reads the same checkbox used by this game's mechanics.
+    public bool AngerEnabled => angerEnabled;
     [FormerlySerializedAs("puzzTimer")]
     [SerializeField] private float roundDurationSeconds;
 

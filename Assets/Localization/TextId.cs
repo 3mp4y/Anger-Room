@@ -15,6 +15,8 @@ namespace AngerRoom.Localization
         TargetScoreLabel = 23,
         TutorialTimerLabel = 24,
         EndTutorial = 25,
+        TutorialLabel = 26,
+        StartLabel = 27,
 
         // Placeholder contracts: every translation must use the same arguments.
         LevelProgress = 30,       // {0} current level, {1} level count
@@ -22,6 +24,7 @@ namespace AngerRoom.Localization
         ScoreProgress = 32,       // {0} current score, {1} target score
         NextLevelCountdown = 33,  // {0:00} seconds
         LabyrinthStatus = 34,     // {0} level, {1:00} minutes, {2:00} seconds
+        LevelNumber = 35,         // {0} level number on a sign
 
         AttemptFailed = 40,       // {0} remaining attempts
         GameDisabled = 41,

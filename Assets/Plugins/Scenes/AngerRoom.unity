@@ -22097,6 +22097,7 @@ GameObject:
   - component: {fileID: 325308306}
   - component: {fileID: 325308308}
   - component: {fileID: 325308309}
+  - component: {fileID: 325308310}
   m_Layer: 0
   m_Name: AudioManager
   m_TagString: Untagged
@@ -22117,6 +22118,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   logger: {fileID: 1898069416}
+  gameConditions: {fileID: 325308310}
   gm: {fileID: 1898069414}
   games:
   - {fileID: 1604975278}
@@ -22124,7 +22126,7 @@ MonoBehaviour:
   - {fileID: 1357735110}
   audienceRight: {fileID: 1931137152}
   audienceLeft: {fileID: 1207216511}
-  host: {fileID: 0}
+  host: {fileID: 449037095}
   clock: {fileID: 688344694}
   audioCooldown: 0
   host_intros: []
@@ -22223,6 +22225,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   languageAdapter: {fileID: 325308308}
   catalog: {fileID: 11400000, guid: 5252af0b278d87540a11056972fa5d92, type: 2}
+--- !u!114 &325308310
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 325308305}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e70915d710324f6e94fc434d83d6ce37, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  cardMinigame: {fileID: 1604975276}
+  gunMinigame: {fileID: 2134677001}
+  labyrinthMinigame: {fileID: 1701803190}
 --- !u!1 &326431995
 GameObject:
   m_ObjectHideFlags: 0
@@ -29682,7 +29699,7 @@ GameObject:
   - component: {fileID: 449037094}
   - component: {fileID: 449037095}
   m_Layer: 0
-  m_Name: Presenter
+  m_Name: Host
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -67260,16 +67277,16 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 408695560}
-        m_TargetAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
-        m_MethodName: set_text
-        m_Mode: 5
+      - m_Target: {fileID: 1701803190}
+        m_TargetAssemblyTypeName: LabyrinthScript, Assembly-CSharp
+        m_MethodName: ShowStartButtonLabel
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Start
+          m_StringArgument:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 1898069414}
@@ -67296,16 +67313,16 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1342325551}
-        m_TargetAssemblyTypeName: TMPro.TMP_Text, Unity.TextMeshPro
-        m_MethodName: set_text
-        m_Mode: 5
+      - m_Target: {fileID: 1701803190}
+        m_TargetAssemblyTypeName: LabyrinthScript, Assembly-CSharp
+        m_MethodName: ShowTutorialTimerLabel
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: Timer
+          m_StringArgument:
           m_BoolArgument: 0
         m_CallState: 2
       - m_Target: {fileID: 1898069416}
@@ -120685,6 +120702,13 @@ MonoBehaviour:
   newPos: {fileID: 984907622}
   TMPTimer: {fileID: 1342325551}
   congrats: {fileID: 152575655}
+  textAdapter: {fileID: 325308309}
+  startButtonText: {fileID: 408695560}
+  tutorialSignText: {fileID: 1691047102}
+  levelSigns:
+  - {fileID: 1637828680}
+  - {fileID: 1962657481}
+  - {fileID: 617120317}
   puzzleTimer: 90
   started: 0
   headAudio: {fileID: 1357735110}

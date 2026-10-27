@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class LaserSparatoLabirinto : MonoBehaviour
@@ -8,8 +6,8 @@ public class LaserSparatoLabirinto : MonoBehaviour
     [SerializeField] Logger logger;
     public Transform OrigineLaser;
     public float maxLineDistance = 20;
+    [Tooltip("Layers identifying player colliders. All layers can block the laser.")]
     public LayerMask Player;
-    public LayerMask Any;
     public GameObject Giocatore;
     public Transform InizioLabirinto;
     public LineRenderer lineRend;
@@ -40,22 +38,25 @@ public class LaserSparatoLabirinto : MonoBehaviour
     {
         thisAudio.Play();
         Ray ray = new Ray(OrigineLaser.position, OrigineLaser.forward);
-        bool hasHitAny = Physics.Raycast(ray, out RaycastHit hitAny, maxLineDistance, Any);
-        bool hasHit = Physics.Raycast(ray, out RaycastHit hit, maxLineDistance, Player);
-        Vector3 endPoint = Vector3.zero;
+        // One raycast supplies both the visible endpoint and the gameplay hit.
+        // All layers can block the beam; triggers follow the project physics setting.
+        // A separate player-only ray would ignore walls and could hit through them.
+        bool hasHitAny = Physics.Raycast(ray, out RaycastHit hitAny, maxLineDistance, Physics.AllLayers);
+        Vector3 endPoint = ray.GetPoint(maxLineDistance);
         if (hasHitAny)
         {
             endPoint = hitAny.point;
-            if (hasHit)
+
+            // A LayerMask is a set of layers. Shift 1 to the hit collider's layer,
+            // then use & to check whether that layer belongs to the Player mask.
+            int hitLayer = hitAny.collider.gameObject.layer;
+            bool hitPlayer = (Player.value & (1 << hitLayer)) != 0;
+            if (hitPlayer)
             {
-            am.playBad(2);
-            logger.Log(gameObject.name);
-            Giocatore.transform.position = new Vector3 (InizioLabirinto.position.x, Giocatore.transform.position.y, InizioLabirinto.position.z);
+                am.playBad(2);
+                logger.Log(gameObject.name);
+                Giocatore.transform.position = new Vector3 (InizioLabirinto.position.x, Giocatore.transform.position.y, InizioLabirinto.position.z);
             }
-        }
-        else //se non colpisce il giocatore, va dritto fino alla fine
-        {
-            endPoint = OrigineLaser.position + OrigineLaser.forward * maxLineDistance;
         }
         
         LineRenderer line = Instantiate(lineRend);

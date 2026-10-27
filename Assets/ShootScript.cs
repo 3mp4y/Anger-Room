@@ -72,7 +72,8 @@ public class ShootScript : MonoBehaviour
             { //codice dove decidiamo che succede se viene colpito
             endPoint = hit.point;
             Target target = hit.transform.GetComponent<Target>();
-            target.OnHit(); 
+            if (target != null)
+                target.TryHit(); // Tutorial hits have effects, but award no points.
             }
             else
             {
@@ -90,11 +91,18 @@ public class ShootScript : MonoBehaviour
             { //codice dove decidiamo che succede se viene colpito un bersaglio
             endPoint = hit.point;
             Target target = hit.transform.GetComponent<Target>();
-                if (Random.Range(0,101) >= failureChance)
+                // The integer overload excludes the upper bound: 0..99 gives
+                // exactly 100 outcomes. A roll below failureChance is a failure,
+                // so 0% never fails, 10% fails on 0..9, and 100% always fails.
+                if (Random.Range(0, 100) >= failureChance)
                 {
-                    target.OnHit();
-                    gunpuz.GotHit();
-                    logger.Log("Shot - Hit");
+                    // The target owns hit acceptance. Only a newly accepted hit
+                    // may increment the score or produce a successful-hit log.
+                    if (target != null && target.TryHit())
+                    {
+                        gunpuz.GotHit();
+                        logger.Log("Shot - Hit");
+                    }
                 }
                 else
                 {

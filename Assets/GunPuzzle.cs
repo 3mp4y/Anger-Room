@@ -34,6 +34,8 @@ public class GunPuzzle : MonoBehaviour
     [SerializeField] int score_to_reach;
     [SerializeField] ShootScript shoot_script;
     [SerializeField] bool angerVar;
+    // Read-only access for GameConditions; the existing Inspector flag stays here.
+    public bool AngerEnabled => angerVar;
     private bool tutorial;
     //CountDown counScript;
     // Start is called before the first frame update
@@ -223,7 +225,7 @@ public class GunPuzzle : MonoBehaviour
         Reset();
         Spawner.StopSpawning();
         TMPScore.text = string.Format("");
-        TMPLevel.text = string.Format("");
+        TMPLevel.text = string.Empty;
         TMPTimer.text = string.Format("");
         tutorial = false;
         gm.stoppedPlaying();
@@ -275,7 +277,6 @@ public class GunPuzzle : MonoBehaviour
                 fakegun.SetActive(true);
                 realgun.SetActive(false);
                 Reset();
-                Spawner.StartSpawning();
                 TMPScore.text = string.Format("");
                 TMPLevel.text = string.Format("");
                 }

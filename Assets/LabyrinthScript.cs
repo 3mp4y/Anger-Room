@@ -1,5 +1,5 @@
 using System.Collections;
-using System.Collections.Generic;
+using AngerRoom.Localization;
 using UnityEngine;
 using TMPro;
 
@@ -10,6 +10,12 @@ public class LabyrinthScript : MonoBehaviour
     public Transform newPos;
     [SerializeField] TextMeshPro TMPTimer;
     [SerializeField] TextMeshPro congrats;
+    [Tooltip("The shared TextAdapter on the AudioManager object.")]
+    [SerializeField] private TextAdapter textAdapter;
+    [SerializeField] private TMP_Text startButtonText;
+    [SerializeField] private TMP_Text tutorialSignText;
+    [Tooltip("The signs inside labyrinths 1, 2 and 3, in that order.")]
+    [SerializeField] private TMP_Text[] levelSigns = new TMP_Text[3];
     [SerializeField] float puzzleTimer;
     private float time_left;
     [SerializeField] bool started = false;
@@ -17,6 +23,8 @@ public class LabyrinthScript : MonoBehaviour
     public GamesManager gm;
     public AudioManager am;
     public bool angerVar;
+    // Read-only access for GameConditions; the existing Inspector flag stays here.
+    public bool AngerEnabled => angerVar;
     private int level;
     [SerializeField] GameObject[] angerObstacles = new GameObject[3];
    
@@ -24,8 +32,28 @@ public class LabyrinthScript : MonoBehaviour
     void Start()
     {
         time_left = puzzleTimer;
-        congrats.text = string.Format("");
+        congrats.text = string.Empty;
         level = 1;
+        // These labels need translating only once: the adapter keeps the language
+        // selected before Play. Direct references also work for inactive signs.
+        startButtonText.text = textAdapter.Get(TextId.TutorialLabel);
+        tutorialSignText.text = textAdapter.Get(TextId.TutorialLabel);
+        for (int i = 0; i < levelSigns.Length; i++)
+        {
+            levelSigns[i].text = textAdapter.Format(TextId.LevelNumber, i + 1);
+        }
+    }
+
+    // The tutorial button's UnityEvents call these instead of assigning English
+    // strings directly to TMP. Keep these public methods available to the scene.
+    public void ShowStartButtonLabel()
+    {
+        startButtonText.text = textAdapter.Get(TextId.StartLabel);
+    }
+
+    public void ShowTutorialTimerLabel()
+    {
+        TMPTimer.text = textAdapter.Get(TextId.TimerLabel);
     }
 
     public void SetStarted(bool x)
@@ -41,7 +69,7 @@ public class LabyrinthScript : MonoBehaviour
     
     public void LastButton()
     {
-        congrats.text = string.Format("¡Has ganado!");
+        congrats.text = textAdapter.Get(TextId.Victory);
         started = false;
         StartCoroutine(DarkenerTeleport(newPos));
         gm.GameWon(2);
@@ -88,15 +116,19 @@ public class LabyrinthScript : MonoBehaviour
         time_left -= Time.deltaTime;
         int minutes = Mathf.FloorToInt(time_left / 60);
         int seconds = Mathf.FloorToInt(time_left % 60);
-        TMPTimer.text = string.Format("Level: " + level + "\n {0:00}:{1:00}", minutes, seconds);
+        // Wording and number placement belong to the translation; gameplay
+        // supplies only the level, minutes and seconds, in this argument order.
+        TMPTimer.text = textAdapter.Format(TextId.LabyrinthStatus, level, minutes, seconds);
         if (time_left <= 0)
             {
                 StartCoroutine(DarkenerTeleport(newPos));
                 started = false;
-                TMPTimer.text = string.Format("");
-                puzzleTimer = 90;
+                TMPTimer.text = string.Empty;
+                puzzleTimer = 93;
                 am.playBad(2);
-                gm.addTries(2, congrats);
+                // The same adapter localizes remaining attempts, game disabled
+                // and the updated points label inside GamesManager.
+                gm.addTries(2, congrats, textAdapter);
             }
         }
     }

@@ -5,6 +5,8 @@ using UnityEngine;
 public class AudioManager : MonoBehaviour
 {
     [SerializeField] Logger logger;
+    [Tooltip("Reads the existing anger checkboxes on the three minigames.")]
+    [SerializeField] private GameConditions gameConditions;
     private LanguageAdapter language_adapter;
     
     public GamesManager gm;
@@ -42,6 +44,11 @@ public class AudioManager : MonoBehaviour
         if (language_adapter == null)
         {
             Debug.LogError("Adapter is missing from this GameObject!", this);
+        }
+
+        if (gameConditions == null)
+        {
+            Debug.LogError("Assign GameConditions on AudioManager. Insults are disabled until it is assigned.", this);
         }
     }
     // Start is called before the first frame update
@@ -111,8 +118,13 @@ public class AudioManager : MonoBehaviour
     }
     public void playBad(int game)
     {
+        // The ordinary error sound is feedback in BOTH conditions. Only the
+        // accompanying insult depends on this particular game's anger checkbox.
         games[game].PlayOneShot(bad);
-        StartCoroutine(specific_insult(game)); 
+        if (CanPlaySpecificInsult(game))
+        {
+            StartCoroutine(specific_insult(game));
+        }
     }
 
     public void playBadSdound()
@@ -150,82 +162,122 @@ public class AudioManager : MonoBehaviour
 
     public void play_gen_insult()
     {
-        StartCoroutine(gen_insult());
+        // Keep this API game-independent: GamesManager's existing timer can
+        // continue calling it without knowing which game the player is using.
+        if (CanPlayGenericInsults)
+        {
+            StartCoroutine(gen_insult());
+        }
     }
+
+    private bool CanPlayGenericInsults =>
+        gameConditions != null && gameConditions.AnyAngerEnabled;
+
+    private bool CanPlaySpecificInsult(int game) =>
+        gameConditions != null && gameConditions.IsAngerEnabled(game);
 
     private IEnumerator gen_insult()
     {
+        if (!CanPlayGenericInsults)
+        {
+            yield break;
+        }
+
         AudioSource targetSource;
         AudioClip clip;
-        // Randomly choose between A and B
-        //bool useA = Random.value < 0.5f;
+        string logMessage;
         if (Random.value < 0.33f)
         {
-            // Safety check
-            if (audience_generic_insults == null || audience_generic_insults.Count == 0)
-                yield return null;
-            // Pick random clip from A
-            clip = audience_generic_insults[Random.Range(0, audience_generic_insults.Count)];
-            // Randomly choose x or y
-            targetSource = (Random.value < 0.5f) ? audienceLeft : audienceRight;
+            if (!TryChooseInsult(audience_generic_insults, out clip))
+                yield break;
 
-            logger.Log("Generic insult from audience");
-            
+            targetSource = (Random.value < 0.5f) ? audienceLeft : audienceRight;
+            logMessage = "Generic insult from audience";
         }
         else
         {
-            // Safety check
-            if (host_time_insults == null || host_time_insults.Count == 0)
-                yield return null;
+            if (!TryChooseInsult(host_time_insults, out clip))
+                yield break;
 
-            // Pick random clip from B
             targetSource = host;
-            clip = host_time_insults[Random.Range(0, host_time_insults.Count)];
-            logger.Log("Generic insult from host");
+            logMessage = "Generic insult from host";
         }
 
+        if (targetSource == null)
+            yield break;
+
         while (targetSource.isPlaying)
-            {
-                yield return null;
-            }
+        {
+            // A request may wait behind narration. Recheck the flags while
+            // waiting and before playback, so disabling all three cancels it.
+            if (!CanPlayGenericInsults)
+                yield break;
+
+            yield return null;
+        }
+
+        if (!CanPlayGenericInsults)
+            yield break;
+
         targetSource.PlayOneShot(clip);
+        logger.Log(logMessage);
     }
+
     private IEnumerator specific_insult(int i)
     {
+        if (!CanPlaySpecificInsult(i))
+            yield break;
+
         AudioSource targetSource;
         AudioClip clip;
+        string logMessage;
         if (Random.value < 0.60f)
         {
-        // Randomly choose between A and B
-        //bool useA = Random.value < 0.5f
-            // Safety check
-        if (audience_generic_insults == null || audience_generic_insults.Count == 0) {yield return null;}
-            // Pick random clip from A
-        clip = audience_specific_insults[i][Random.Range(0, audience_specific_insults[i].Count)];
-            // Randomly choose x or y
-        targetSource = (Random.value < 0.5f) ? audienceLeft : audienceRight;
-        logger.Log("Specific insult from audience");
-        /*nif (Random.value < 0.5f) {targetSource = audienceLeft;}
-        else { targetSource = audienceRight; } */
+            // Validate the actual game's list, not the unrelated generic list.
+            if (!TryChooseInsult(audience_specific_insults[i], out clip))
+                yield break;
+
+            targetSource = (Random.value < 0.5f) ? audienceLeft : audienceRight;
+            logMessage = "Specific insult from audience";
         }
         else
         {
-            if (host_error_insults == null || host_error_insults.Count == 0)
-                yield return null;
+            if (!TryChooseInsult(host_error_insults, out clip))
+                yield break;
 
-            // Pick random clip from B
             targetSource = host;
-            clip = host_error_insults[Random.Range(0, host_time_insults.Count)];
-            logger.Log("Specific insult from host");
+            logMessage = "Specific insult from host";
         }
 
+        if (targetSource == null)
+            yield break;
+
         while (targetSource.isPlaying)
-            {
-                yield return null;
-            }
+        {
+            if (!CanPlaySpecificInsult(i))
+                yield break;
+
+            yield return null;
+        }
+
+        // Do not require an active game here. A failure insult can accompany
+        // the end of an attempt, after GamesManager has stopped its timer.
+        if (!CanPlaySpecificInsult(i))
+            yield break;
 
         targetSource.PlayOneShot(clip);
+        logger.Log(logMessage);
     }
 
+    private static bool TryChooseInsult(List<AudioClip> clips, out AudioClip clip)
+    {
+        clip = null;
+        if (clips == null || clips.Count == 0)
+            return false;
 
+        // Use THIS list's length. A missing clip is skipped while the language
+        // recordings are being completed; waiting one frame would not fix it.
+        clip = clips[Random.Range(0, clips.Count)];
+        return clip != null;
+    }
 }
