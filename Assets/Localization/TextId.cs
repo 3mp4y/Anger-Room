@@ -32,10 +32,7 @@ namespace AngerRoom.Localization
         Points = 50,              // {0} awarded/available points
         ScoreboardEntry = 51,     // {0} participant ID, {1} points, {2} rank
 
-        RewardLocked = 60,
-        RewardOpen = 61,
-        RewardReach = 62,
-        RewardCollected = 63,
+        // 60-63 were retired when reward buttons switched from words to icons.
         RewardCards = 64,
         RewardGun = 65,
         RewardLabyrinth = 66

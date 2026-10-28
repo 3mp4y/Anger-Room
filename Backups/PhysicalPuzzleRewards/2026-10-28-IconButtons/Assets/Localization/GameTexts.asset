@@ -1,0 +1,161 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a602361394ff4702a112823f8da64992, type: 3}
+  m_Name: GameTexts
+  m_EditorClassIdentifier: 
+  entries:
+  - id: 10
+    english: You won!
+    italian: Hai vinto!
+    spanish: "\xA1Has ganado!"
+  - id: 20
+    english: Level
+    italian: Livello
+    spanish: Nivel
+  - id: 21
+    english: Round
+    italian: Turno
+    spanish: Ronda
+  - id: 22
+    english: Timer
+    italian: Tempo
+    spanish: Reloj
+  - id: 23
+    english: Target score
+    italian: Punteggio da raggiungere
+    spanish: "Puntuaci\xF3n a alcanzar"
+  - id: 24
+    english: Tutorial timer
+    italian: Tempo del tutorial
+    spanish: Reloj del tutorial
+  - id: 25
+    english: "End\nTutorial"
+    italian: "Termina\nil tutorial"
+    spanish: "Finalizar\ntutorial"
+  - id: 26
+    english: Tutorial
+    italian: Tutorial
+    spanish: Tutorial
+  - id: 27
+    english: Start
+    italian: Inizia
+    spanish: Empezar
+  - id: 30
+    english: 'Level
+
+      {0}/{1}'
+    italian: 'Livello
+
+      {0}/{1}'
+    spanish: 'Nivel
+
+      {0}/{1}'
+  - id: 31
+    english: 'Round
+
+      {0}/{1}'
+    italian: 'Turno
+
+      {0}/{1}'
+    spanish: 'Ronda
+
+      {0}/{1}'
+  - id: 32
+    english: 'Points
+
+      {0}/{1}'
+    italian: 'Punti
+
+      {0}/{1}'
+    spanish: 'Puntos
+
+      {0}/{1}'
+  - id: 33
+    english: 'Next level in...
+
+      {0:00}'
+    italian: 'Prossimo livello tra...
+
+      {0:00}'
+    spanish: 'Siguiente nivel en...
+
+      {0:00}'
+  - id: 34
+    english: 'Level: {0}
+
+      {1:00}:{2:00}'
+    italian: 'Livello: {0}
+
+      {1:00}:{2:00}'
+    spanish: 'Nivel: {0}
+
+      {1:00}:{2:00}'
+  - id: 35
+    english: 'Level {0}'
+    italian: 'Livello {0}'
+    spanish: 'Nivel {0}'
+  - id: 40
+    english: 'You failed :(
+
+      Attempts remaining: {0}'
+    italian: 'Hai fallito :(
+
+      Tentativi rimasti: {0}'
+    spanish: 'Has fallado :(
+
+      Intentos restantes: {0}'
+  - id: 41
+    english: 'You failed!
+
+      Game disabled.'
+    italian: 'Hai fallito!
+
+      Gioco disattivato.'
+    spanish: 'Has fallado!
+
+      Juego desactivado.'
+  - id: 50
+    english: '{0}pts'
+    italian: '{0}pt'
+    spanish: '{0}pts'
+  - id: 51
+    english: 'Participant {0}: {1}pts - #{2}'
+    italian: 'Partecipante {0}: {1}pt - #{2}'
+    spanish: 'Participante {0}: {1}pts - #{2}'
+  - id: 60
+    english: Locked
+    italian: Bloccato
+    spanish: Bloqueado
+  - id: 61
+    english: Open
+    italian: Apri
+    spanish: Abrir
+  - id: 62
+    english: Collect points
+    italian: Raccogli i punti
+    spanish: Recoge los puntos
+  - id: 63
+    english: Collected
+    italian: Raccolti
+    spanish: Recogidos
+  - id: 64
+    english: Cards
+    italian: Carte
+    spanish: Cartas
+  - id: 65
+    english: Shooting
+    italian: Tiro al bersaglio
+    spanish: Tiro al blanco
+  - id: 66
+    english: Labyrinth
+    italian: Labirinto
+    spanish: Laberinto

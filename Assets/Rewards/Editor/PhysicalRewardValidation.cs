@@ -24,25 +24,38 @@ public static class PhysicalRewardValidation
         if (!condition) throw new Exception(message);
         checks++;
     }
-    static string State(PuzzleRewardBox box) => Get(box, "state").ToString();
-    static void SetState(PuzzleRewardBox box, string value) => Set(box, "state", Enum.Parse(Get(box, "state").GetType(), value));
+    static string State(MinigameRewardBox box) => Get(box, "state").ToString();
+    static void SetState(MinigameRewardBox box, string value) => Set(box, "state", Enum.Parse(Get(box, "state").GetType(), value));
     static int PlayerPoints(ScoreboardManager scoreboard) => (int)Get(Get(scoreboard, "player"), "points");
 
     public static void Run()
     {
         if (!Application.isBatchMode) throw new InvalidOperationException("Run this validation in a separate Unity batch process; it opens a scene and exits without saving.");
-        Directory.CreateDirectory("Temp/PhysicalRewardChecks");
+        Directory.CreateDirectory("Logs/PhysicalRewardChecks");
         try
         {
             var scene = EditorSceneManager.OpenScene("Assets/Plugins/Scenes/AngerRoom.unity");
             var all = scene.GetRootGameObjects().SelectMany(g => g.GetComponentsInChildren<Transform>(true)).ToArray();
-            var boxes = all.Select(t => t.GetComponent<PuzzleRewardBox>()).Where(b => b != null).OrderBy(b => (int)Get(b, "gameIndex")).ToArray();
+            var boxes = all.Select(t => t.GetComponent<MinigameRewardBox>()).Where(b => b != null).OrderBy(b => (int)Get(b, "gameIndex")).ToArray();
             Check(boxes.Length == 3, "Three physical rewards required");
             foreach (var box in boxes)
             {
-                foreach (var field in new[] { "gamesManager", "textAdapter", "reachInput", "lid", "pointsText", "buttonText", "puzzleLabel", "openButton" })
+                foreach (var field in new[] { "gamesManager", "textAdapter", "reachInput", "lid", "pointsText", "buttonIcon", "lockedIcon", "unlockedIcon", "openButton" })
                     Check((UnityEngine.Object)Get(box, field) != null, box.name + " missing " + field);
                 var poke = (PokeInteractable)Get(box, "openButton");
+                Check(poke.GetComponentsInChildren<RayInteractable>(true).Length == 0, "Reward button accepts ray interaction");
+                Check(poke.GetComponentsInChildren<TMP_Text>(true).Length == 0, "Button text was not removed");
+                var colorVisual = poke.GetComponentInChildren<InteractableColorVisual>(true);
+                Check(colorVisual != null && colorVisual.enabled, "Missing enabled button colour visual");
+                var palette = new SerializedObject(colorVisual);
+                Check(palette.FindProperty("_interactableView").objectReferenceValue == poke, "Colour observes wrong interactable");
+                Check(palette.FindProperty("_colorShaderPropertyName").stringValue == "_Color", "Wrong button shader property");
+                foreach (var stateName in new[] { "_disabledColorState", "_normalColorState", "_hoverColorState", "_selectColorState" })
+                {
+                    Color tint = palette.FindProperty(stateName).FindPropertyRelative("Color").colorValue;
+                    Check(tint.a > 0f && tint.a < 1f, "Button tint must be translucent");
+                    Check(stateName == "_disabledColorState" ? tint.r > tint.g : tint.g > tint.r, "Wrong locked/unlocked hue");
+                }
                 var wrapper = poke.GetComponent<PointableUnityEventWrapper>();
                 Check(wrapper != null, "Button wrapper missing");
                 Check(wrapper.WhenSelect.GetPersistentEventCount() == 2, "Button callback count");
@@ -59,7 +72,7 @@ public static class PhysicalRewardValidation
             var manager = (GamesManager)Get(boxes[0], "gamesManager");
             var scoreboard = manager.GetComponent<ScoreboardManager>();
             var logger = manager.GetComponent<Logger>();
-            Set(logger, "_logPath", Path.GetFullPath("Temp/PhysicalRewardChecks/game-events.log"));
+            Set(logger, "_logPath", Path.GetFullPath("Logs/PhysicalRewardChecks/game-events.log"));
             Call(manager, "Awake");
             Call(manager, "Start");
             Call(scoreboard, "Start");
@@ -73,6 +86,7 @@ public static class PhysicalRewardValidation
                 box.OpenBox();
                 Check(State(box) == "Locked" && !manager.TryCollectReward(game), "Unfinished game unlocked or collected");
                 Check(!((PokeInteractable)Get(box, "openButton")).enabled, "Locked button enabled");
+                Check(((SpriteRenderer)Get(box, "buttonIcon")).sprite == (Sprite)Get(box, "lockedIcon"), "Wrong locked icon");
             }
             var catalog = AssetDatabase.LoadAssetAtPath<TextCatalog>("Assets/Localization/GameTexts.asset");
             foreach (LanguageAdapter.Language language in Enum.GetValues(typeof(LanguageAdapter.Language)))
@@ -118,6 +132,8 @@ public static class PhysicalRewardValidation
             Call(animated, "RefreshReward");
             manager.GameWon(1);
             Check(State(animated) == "Ready", "Win event did not unlock box");
+            Check(((PokeInteractable)Get(animated, "openButton")).enabled, "Unlocked button disabled");
+            Check(((SpriteRenderer)Get(animated, "buttonIcon")).sprite == (Sprite)Get(animated, "unlockedIcon"), "Wrong unlocked icon");
             int animationBefore = PlayerPoints(scoreboard);
             animated.OpenBox();
             Check(State(animated) == "Opening", "Button did not open lid");
@@ -143,25 +159,42 @@ public static class PhysicalRewardValidation
             Set(animated, "elapsed", .55f);
             Call(animated, "Update");
             Check(State(animated) == "Collected" && !points.gameObject.activeSelf, "Reward did not disappear");
+            Check(((SpriteRenderer)Get(animated, "buttonIcon")).sprite == (Sprite)Get(animated, "unlockedIcon"), "Collected reward switched back to locked icon");
+            animated.OpenBox();
+            Check(State(animated) == "Collected", "Repeated physical press reopened collected reward");
             Check(PlayerPoints(scoreboard) == animationBefore + 100, "Animation did not award once");
             Call(animated, "Update");
             Check(PlayerPoints(scoreboard) == animationBefore + 100, "Animation awarded twice");
-            File.WriteAllText("Temp/PhysicalRewardChecks/result.txt", "PASS: " + checks + " checks. Headset reach/poke still requires hardware testing.");
+            File.WriteAllText("Logs/PhysicalRewardChecks/result.txt", "PASS: " + checks + " checks. Headset reach/poke still requires hardware testing.");
             Debug.Log("PHYSICAL_REWARDS_PASS " + checks);
             EditorApplication.Exit(0);
         }
         catch (Exception e)
         {
             Debug.LogException(e);
-            File.WriteAllText("Temp/PhysicalRewardChecks/result.txt", "FAIL after " + checks + " checks: " + e);
+            File.WriteAllText("Logs/PhysicalRewardChecks/result.txt", "FAIL after " + checks + " checks: " + e);
             EditorApplication.Exit(1);
         }
     }
 
-    static void Render(PuzzleRewardBox box, string name)
+    static void Render(MinigameRewardBox box, string name)
     {
+        // Edit Mode has no interaction updates. Apply the SDK's configured state
+        // colour for the preview; actual state transitions are a headset check.
+        var poke = (PokeInteractable)Get(box, "openButton");
+        var visual = poke.GetComponentInChildren<InteractableColorVisual>(true);
+        var palette = new SerializedObject(visual);
+        Color tint = palette.FindProperty(poke.enabled ? "_normalColorState" : "_disabledColorState").FindPropertyRelative("Color").colorValue;
+        Set(visual, "_colorShaderID", Shader.PropertyToID("_Color"));
+        typeof(InteractableColorVisual).GetMethod("SetColor", Flags).Invoke(visual, new object[] { tint });
+        ((MaterialPropertyBlockEditor)palette.FindProperty("_editor").objectReferenceValue).UpdateMaterialPropertyBlock();
+        // Tests run within one editor frame. A fresh preview renderer avoids using
+        // the previous sprite texture cached by an earlier Camera.Render call.
+        var sourceIcon = (SpriteRenderer)Get(box, "buttonIcon");
+        var previewIcon = UnityEngine.Object.Instantiate(sourceIcon, sourceIcon.transform.parent);
+        sourceIcon.enabled = false;
         var camera = new GameObject("Reward validation camera").AddComponent<Camera>();
-        camera.transform.position = box.transform.position + new Vector3(.6f, 1.7f, -1.7f);
+        camera.transform.position = box.transform.TransformPoint(new Vector3(.6f, 1.7f, 1.7f));
         camera.transform.LookAt(box.transform.position + Vector3.up * 1.05f);
         camera.fieldOfView = 45;
         camera.nearClipPlane = .03f;
@@ -173,10 +206,12 @@ public static class PhysicalRewardValidation
         var image = new Texture2D(1000, 1000, TextureFormat.RGB24, false);
         image.ReadPixels(new Rect(0, 0, 1000, 1000), 0, 0);
         image.Apply();
-        File.WriteAllBytes("Temp/PhysicalRewardChecks/" + name + ".png", image.EncodeToPNG());
+        File.WriteAllBytes("Logs/PhysicalRewardChecks/" + name + ".png", image.EncodeToPNG());
         RenderTexture.active = null;
         UnityEngine.Object.DestroyImmediate(camera.gameObject);
         UnityEngine.Object.DestroyImmediate(target);
         UnityEngine.Object.DestroyImmediate(image);
+        UnityEngine.Object.DestroyImmediate(previewIcon.gameObject);
+        sourceIcon.enabled = true;
     }
 }
