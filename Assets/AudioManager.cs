@@ -30,6 +30,7 @@ public class AudioManager : MonoBehaviour
     private List<AudioClip> audience_gun_insults;
     private List<AudioClip> audience_lab_insults;
     private List<AudioClip>[] audience_specific_insults = new List<AudioClip>[3];
+    private GameObject dialog;
     
     [Header("Sounds")]
     [SerializeField] AudioClip bad;
@@ -61,11 +62,12 @@ public class AudioManager : MonoBehaviour
         host_error_insults = language_adapter.HostErrorInsults;
         host_loss =  language_adapter.HostLoss;
         audience_generic_insults = language_adapter.AudienceGenericInsults;
-        audience_time_insults = language_adapter.AudienceTimeInsults;
+        //audience_time_insults = language_adapter.AudienceTimeInsults;
+        audience_generic_insults = audience_time_insults;
         audience_card_insults = language_adapter.AudienceCardInsults;
         audience_gun_insults = language_adapter.AudienceGunInsults;
         audience_lab_insults = language_adapter.AudienceLabInsults;
-
+        dialog = language_adapter.Dialogue;
         audioCooldown = false;   
         audience_specific_insults[0] = audience_card_insults;
         audience_specific_insults[1] = audience_gun_insults;
@@ -76,6 +78,11 @@ public class AudioManager : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void FirstDialog()
+    {
+        dialog.SetActive(true);
     }
 
     public void PlayIntro(GameObject UI_button)

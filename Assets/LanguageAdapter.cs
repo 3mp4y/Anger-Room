@@ -63,6 +63,11 @@ public class LanguageAdapter : MonoBehaviour
     [SerializeField] private List<AudioClip> audience_lab_insults_ITA;
     [SerializeField] private List<AudioClip> audience_lab_insults_ES;
     [SerializeField] private List<AudioClip> audience_lab_insults_ENG;
+
+    [Header("First Dialogue UI")]
+    [SerializeField] private GameObject _dialogue_ita;
+    [SerializeField] private GameObject _dialogue_es;
+    [SerializeField] private GameObject _dialogue_eng;
     // Start is called before the first frame update
     void Start()
     {
@@ -77,6 +82,17 @@ public class LanguageAdapter : MonoBehaviour
 // --- PRIVATE HELPER METHOD ---
     // Selects the right list based on currentLanguage
     private List<AudioClip> GetLocalizedList(List<AudioClip> ita, List<AudioClip> es, List<AudioClip> eng)
+    {
+        return currentLanguage switch
+        {
+            Language.Italian => ita,
+            Language.Spanish  => es,
+            Language.English => eng,
+            _            => eng
+        };
+    }
+
+    private GameObject GetLocalizedGO(GameObject ita, GameObject es, GameObject eng)
     {
         return currentLanguage switch
         {
@@ -117,4 +133,7 @@ public class LanguageAdapter : MonoBehaviour
 
     public List<AudioClip> AudienceLabInsults 
         => GetLocalizedList(audience_lab_insults_ITA, audience_lab_insults_ES, audience_lab_insults_ENG);
+
+    public GameObject Dialogue 
+        => GetLocalizedGO(_dialogue_ita, _dialogue_es, _dialogue_es);
 }
