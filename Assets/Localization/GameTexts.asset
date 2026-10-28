@@ -131,3 +131,31 @@ MonoBehaviour:
     english: 'Participant {0}: {1}pts - #{2}'
     italian: 'Partecipante {0}: {1}pt - #{2}'
     spanish: 'Participante {0}: {1}pts - #{2}'
+  - id: 60
+    english: Locked
+    italian: Bloccato
+    spanish: Bloqueado
+  - id: 61
+    english: Open
+    italian: Apri
+    spanish: Abrir
+  - id: 62
+    english: Collect points
+    italian: Raccogli i punti
+    spanish: Recoge los puntos
+  - id: 63
+    english: Collected
+    italian: Raccolti
+    spanish: Recogidos
+  - id: 64
+    english: Cards
+    italian: Carte
+    spanish: Cartas
+  - id: 65
+    english: Shooting
+    italian: Tiro al bersaglio
+    spanish: Tiro al blanco
+  - id: 66
+    english: Labyrinth
+    italian: Labirinto
+    spanish: Laberinto

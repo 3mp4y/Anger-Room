@@ -44,6 +44,13 @@ namespace AngerRoom.Localization
         // does not replace values already serialized into that asset.
         [SerializeField] private List<Entry> entries = new List<Entry>
         {
+            new Entry(TextId.RewardLocked, "Locked", "Bloccato", "Bloqueado"),
+            new Entry(TextId.RewardOpen, "Open", "Apri", "Abrir"),
+            new Entry(TextId.RewardReach, "Collect points", "Raccogli i punti", "Recoge los puntos"),
+            new Entry(TextId.RewardCollected, "Collected", "Raccolti", "Recogidos"),
+            new Entry(TextId.RewardCards, "Cards", "Carte", "Cartas"),
+            new Entry(TextId.RewardGun, "Shooting", "Tiro al bersaglio", "Tiro al blanco"),
+            new Entry(TextId.RewardLabyrinth, "Labyrinth", "Labirinto", "Laberinto"),
             new Entry(TextId.Victory,
                 "You won!", "Hai vinto!", "¡Has ganado!"),
             new Entry(TextId.LevelLabel,

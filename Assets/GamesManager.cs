@@ -20,6 +20,30 @@ public class GamesManager : MonoBehaviour
     [SerializeField] int[] gameTries = {0,0,0};
     [SerializeField] int[] gamePoints = {100, 100, 100};
     [SerializeField] int[] wins = {0,0,0};
+    // GamesManager owns the reward value and collection permission. The physical
+    // boxes only display/animate it; they never calculate or award points themselves.
+    private readonly bool[] collectedRewards = new bool[3];
+    public event System.Action<int> RewardChanged;
+
+    public int GetRewardPoints(int game) => IsValidGame(game) ? gamePoints[game] : 0;
+    public bool IsRewardCollected(int game) => IsValidGame(game) && collectedRewards[game];
+    public bool IsGameResolved(int game) => IsValidGame(game) && (wins[game] == 1 || gameTries[game] >= 3);
+    public bool CanCollectReward(int game) => IsGameResolved(game) && !collectedRewards[game];
+    private bool IsValidGame(int game) => game >= 0 && game < gamePoints.Length;
+
+    public bool TryCollectReward(int game)
+    {
+        if (!CanCollectReward(game) || scoreManager == null)
+            return false;
+
+        // Claim before calling other components. Repeated reaches, animation
+        // callbacks or duplicate requests cannot award this puzzle twice.
+        collectedRewards[game] = true;
+        scoreManager.AddPlayerPoints(gamePoints[game]);
+        logger.Log("Collected reward for game id:" + game + " points:" + gamePoints[game]);
+        RewardChanged?.Invoke(game);
+        return true;
+    }
     public GameObject[] bulbs= new GameObject[3];
     public Material[] lights = new Material[3];
     [SerializeField] private GameObject[] tutorialButtons= new GameObject[3];
@@ -140,6 +164,7 @@ public class GamesManager : MonoBehaviour
 
     public void addTries(int i, TextMeshPro message, TextAdapter textAdapter)
     {
+        if (!IsValidGame(i) || IsGameResolved(i)) return;
         gameTries[i] += 1;
         gamePoints[i] -= 30;
         Debug.Log(gamePoints[i]);
@@ -166,7 +191,8 @@ public class GamesManager : MonoBehaviour
                     //scores[i].text = string.Format("10pts");
                     //scores2[i].color = new Color32(132, 132, 132, 200);
                     //scores2[i].text = string.Format("10pts");
-                    scoreManager.AddPlayerPoints(10);
+                    // Ten points remain after the third failure. Unlock the box;
+                    // the scoreboard receives them only when its reward is collected.
                     StartCoroutine(lossMessage(gameTries[i], true, message, textAdapter));
                     _reactivationBlacklist.Add(realButtons[i]);
                     break;
@@ -174,6 +200,7 @@ public class GamesManager : MonoBehaviour
                      break;
         }
         bulbs[i].GetComponent<Renderer>().material = lights[gameTries[i]-1];
+        RewardChanged?.Invoke(i);
         stoppedPlaying();
         CheckLost();
     }
@@ -248,10 +275,11 @@ public class GamesManager : MonoBehaviour
 
     public void GameWon(int game)
     {
-        scoreManager.AddPlayerPoints(gamePoints[game]);
+        if (!IsValidGame(game) || IsGameResolved(game)) return;
         logger.Log("Game  id:" + game + " was won with points" + gamePoints[game]);
         wins[game] = 1;
         _reactivationBlacklist.Add(realButtons[game]);
+        RewardChanged?.Invoke(game);
         if (wins[0] == 1 && wins[1] == 1 && wins[2] == 1)
         {
           am.playEnd();
