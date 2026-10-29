@@ -326,7 +326,7 @@ public class Card_Minigame : MonoBehaviour
                 else
                 {
                     currentRound = 1;
-                    currentLevel += 3;
+                    currentLevel ++;
                     StartCoroutine(ShowLevelTransition());
                     yield return new WaitForSeconds(4.1f);
                     timeReduction += TimeReductionPerLevel;
