@@ -20,12 +20,12 @@ RenderSettings:
   m_FogDensity: 0.01
   m_LinearFogStart: 0
   m_LinearFogEnd: 300
-  m_AmbientSkyColor: {r: 0.22406736, g: 0.2208966, b: 0.2208966, a: 1}
+  m_AmbientSkyColor: {r: 0.05601684, g: 0.05522415, b: 0.05522415, a: 1}
   m_AmbientEquatorColor: {r: 0.114, g: 0.125, b: 0.133, a: 1}
   m_AmbientGroundColor: {r: 0.047, g: 0.043, b: 0.035, a: 1}
   m_AmbientIntensity: 1
   m_AmbientMode: 3
-  m_SubtractiveShadowColor: {r: 0.16981131, g: 0.16981131, b: 0.16981131, a: 1}
+  m_SubtractiveShadowColor: {r: 0.16037738, g: 0.16037738, b: 0.16037738, a: 1}
   m_SkyboxMaterial: {fileID: 0}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
@@ -134,6 +134,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser (18)
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -50.559998
@@ -5142,6 +5146,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 2-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.035725184
@@ -6727,6 +6735,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser (10)
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.18682002
@@ -21583,6 +21595,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser (21)
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -45.5
@@ -34636,6 +34652,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser (9)
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.18682002
@@ -34794,7 +34814,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -2353561579252473944, guid: 708bb04189b8488418aa725e7f94bbe8, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
-      value: 4
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: -2353561579252473944, guid: 708bb04189b8488418aa725e7f94bbe8, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
@@ -34810,6 +34830,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -2353561579252473944, guid: 708bb04189b8488418aa725e7f94bbe8, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[3].m_Mode
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: -2353561579252473944, guid: 708bb04189b8488418aa725e7f94bbe8, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[4].m_Mode
       value: 6
       objectReference: {fileID: 0}
     - target: {fileID: -2353561579252473944, guid: 708bb04189b8488418aa725e7f94bbe8, type: 3}
@@ -34829,6 +34853,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 614643086}
     - target: {fileID: -2353561579252473944, guid: 708bb04189b8488418aa725e7f94bbe8, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[4].m_Target
+      value: 
+      objectReference: {fileID: 8800000003}
+    - target: {fileID: -2353561579252473944, guid: 708bb04189b8488418aa725e7f94bbe8, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
       value: 2
       objectReference: {fileID: 0}
@@ -34842,6 +34870,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -2353561579252473944, guid: 708bb04189b8488418aa725e7f94bbe8, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[3].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -2353561579252473944, guid: 708bb04189b8488418aa725e7f94bbe8, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[4].m_CallState
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: -2353561579252473944, guid: 708bb04189b8488418aa725e7f94bbe8, type: 3}
@@ -34861,6 +34893,10 @@ PrefabInstance:
       value: SetActive
       objectReference: {fileID: 0}
     - target: {fileID: -2353561579252473944, guid: 708bb04189b8488418aa725e7f94bbe8, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[4].m_MethodName
+      value: SetActive
+      objectReference: {fileID: 0}
+    - target: {fileID: -2353561579252473944, guid: 708bb04189b8488418aa725e7f94bbe8, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
       value: UnityEngine.GameObject, UnityEngine
       objectReference: {fileID: 0}
@@ -34877,6 +34913,10 @@ PrefabInstance:
       value: UnityEngine.GameObject, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: -2353561579252473944, guid: 708bb04189b8488418aa725e7f94bbe8, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[4].m_TargetAssemblyTypeName
+      value: UnityEngine.GameObject, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: -2353561579252473944, guid: 708bb04189b8488418aa725e7f94bbe8, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_BoolArgument
       value: 1
       objectReference: {fileID: 0}
@@ -34886,6 +34926,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -2353561579252473944, guid: 708bb04189b8488418aa725e7f94bbe8, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[3].m_Arguments.m_BoolArgument
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -2353561579252473944, guid: 708bb04189b8488418aa725e7f94bbe8, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[4].m_Arguments.m_BoolArgument
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -2353561579252473944, guid: 708bb04189b8488418aa725e7f94bbe8, type: 3}
@@ -34906,6 +34950,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -2353561579252473944, guid: 708bb04189b8488418aa725e7f94bbe8, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[3].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: -2353561579252473944, guid: 708bb04189b8488418aa725e7f94bbe8, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[4].m_Arguments.m_ObjectArgumentAssemblyTypeName
       value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 243424268127923124, guid: 708bb04189b8488418aa725e7f94bbe8, type: 3}
@@ -40765,6 +40813,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: T-SparaLaser2
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.y
       value: 0.18681999
@@ -41186,6 +41238,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser (17)
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -51.559998
@@ -42801,6 +42857,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 2-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.035725184
@@ -53267,6 +53327,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 2-SparaLaser (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.035725188
@@ -56726,6 +56790,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -41.851013
@@ -65000,6 +65068,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser (25)
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -42.38
@@ -76474,6 +76546,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 2-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.035725184
@@ -77712,6 +77788,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 2-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.035725184
@@ -80381,6 +80461,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 2-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.035725184
@@ -81064,6 +81148,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.18682002
@@ -86845,6 +86933,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 1-SparaLaser1
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.y
       value: 0.18681999
@@ -86938,6 +87030,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 2-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.035725184
@@ -87363,6 +87459,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 2-SparaLaser (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.03572519
@@ -88202,6 +88302,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 2-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.035725184
@@ -93867,6 +93971,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser (11)
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.18682002
@@ -95989,6 +96097,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -40.77301
@@ -97554,7 +97666,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1144743484
 Transform:
   m_ObjectHideFlags: 0
@@ -97721,6 +97833,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser (6)
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.y
       value: 0.18681999
@@ -109304,6 +109420,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -45.70401
@@ -109582,6 +109702,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser (20)
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -45.49
@@ -113738,6 +113862,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 2-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.035725184
@@ -113941,6 +114069,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -44.153015
@@ -114163,6 +114295,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -43.66101
@@ -114846,6 +114982,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -43.201004
@@ -114928,6 +115068,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser (29)
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -54.24
@@ -115226,6 +115370,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser (19)
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -49.559998
@@ -115344,6 +115492,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 2-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.035725184
@@ -118113,6 +118265,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser (27)
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -39.32
@@ -121050,6 +121206,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 2-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.035725184
@@ -122028,6 +122188,10 @@ PrefabInstance:
       propertyPath: m_PlayOnAwake
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.y
       value: 0.18681999
@@ -128296,6 +128460,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -40.21901
@@ -128867,6 +129035,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 2-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.035725184
@@ -132010,6 +132182,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser (22)
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -49.559998
@@ -132226,6 +132402,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -41.292007
@@ -134320,6 +134500,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.y
       value: 0.18681999
@@ -135943,6 +136127,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 2-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.035725184
@@ -136809,6 +136997,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -44.680008
@@ -140415,6 +140607,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser (26)
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -50.559998
@@ -149841,6 +150037,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser (7)
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.y
       value: 0.18681999
@@ -153497,6 +153697,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 2-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.035725184
@@ -155307,6 +155511,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 2-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.035725184
@@ -156333,6 +156541,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser (16)
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -51.56
@@ -157273,6 +157485,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 2-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.035725184
@@ -158459,6 +158675,10 @@ PrefabInstance:
       propertyPath: MaxDistance
       value: 10
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.035725184
@@ -159864,6 +160084,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -45.190002
@@ -162313,6 +162537,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser (8)
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalScale.y
       value: 0.18681999
@@ -162987,6 +163215,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 3-SparaLaser (28)
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -53.240005
@@ -169662,7 +169894,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8800000004
 Transform:
   m_ObjectHideFlags: 0
@@ -172308,6 +172540,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: 1-SparaLaser1
       objectReference: {fileID: 0}
+    - target: {fileID: 5172545089698964908, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
+      propertyPath: OutputAudioMixerGroup
+      value: 
+      objectReference: {fileID: 7842009118270861692, guid: 4abc308b272601242874f313f5810164, type: 2}
     - target: {fileID: 8825544443039896715, guid: 9a68d6a09491f4759ad81d6f06f01ac5, type: 3}
       propertyPath: m_LocalPosition.x
       value: 14.52
