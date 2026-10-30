@@ -39,10 +39,23 @@ namespace AngerRoom.Rewards
         [Tooltip("Full back-and-forth cycles per second. 0.25 takes four seconds.")]
         [SerializeField, Min(0f)] private float rotationFrequency = 0.25f;
 
+        [Header("Points colour (remaining attempts: 3 / 2 / 1 / 0)")]
+        [SerializeField] private Color threeAttemptsColor = new Color32(40, 200, 70, 255);
+        [SerializeField] private Color twoAttemptsColor = new Color32(217, 209, 0, 255);
+        [SerializeField] private Color oneAttemptColor = new Color32(240, 10, 10, 255);
+        [SerializeField] private Color noAttemptsColor = new Color32(64, 64, 64, 255);
+
         [Header("Collection")]
         [SerializeField, Min(0.01f)] private float reachRadius = 0.16f;
         [SerializeField, Min(0.1f)] private float collectDuration = 0.55f;
         [SerializeField] private float collectSpinSpeed = 900f;
+
+        [Header("Collection audio (optional)")]
+        [Tooltip("Played when successfully collecting more than 10 points.")]
+        [SerializeField] private AudioClip rewardCollectionClip;
+        [Tooltip("Played when successfully collecting the minimum reward of 10 points.")]
+        [SerializeField] private AudioClip minimumRewardCollectionClip;
+        [SerializeField, Range(0f, 1f)] private float collectionVolume = 0.5f;
 
         // A single state prevents repeated button presses from starting overlapping
         // animations, and repeated hand samples from collecting the same reward.
@@ -57,6 +70,7 @@ namespace AngerRoom.Rewards
         private float animationTime;
         private float spin;
         private bool initialized;
+        private Color attemptColor;
 
         private void Start()
         {
@@ -103,6 +117,15 @@ namespace AngerRoom.Rewards
         private void RefreshReward()
         {
             pointsText.text = textAdapter.Format(TextId.Points, gamesManager.GetRewardPoints(gameIndex));
+            // GamesManager owns attempts; this component owns their visual presentation.
+            switch (gamesManager.getRemainingTries(gameIndex))
+            {
+                case 3: attemptColor = threeAttemptsColor; break;
+                case 2: attemptColor = twoAttemptsColor; break;
+                case 1: attemptColor = oneAttemptColor; break;
+                default: attemptColor = noAttemptsColor; break;
+            }
+            UpdatePointsColor();
             if (gamesManager.IsRewardCollected(gameIndex))
             {
                 state = State.Collected;
@@ -142,6 +165,7 @@ namespace AngerRoom.Rewards
             float dt = Time.deltaTime;
             animationTime += dt;
             elapsed += dt;
+            UpdatePointsColor();
 
             float rise = 0f;
             if (state == State.Opening)
@@ -173,7 +197,16 @@ namespace AngerRoom.Rewards
                 {
                     // This is the only award request, at the end of the disappearance.
                     // GamesManager independently guards ownership and duplicate awards.
-                    if (!gamesManager.TryCollectReward(gameIndex))
+                    int awardedPoints = gamesManager.GetRewardPoints(gameIndex);
+                    Vector3 soundPosition = pointsText.transform.position;
+                    if (gamesManager.TryCollectReward(gameIndex))
+                    {
+                        // Play only after a successful award, never for duplicate reaches.
+                        // The temporary source survives the points object being hidden.
+                        AudioClip clip = GetCollectionClip(awardedPoints);
+                        if (clip != null) AudioSource.PlayClipAtPoint(clip, soundPosition, collectionVolume);
+                    }
+                    else
                     {
                         RefreshReward();
                         if (state != State.Collected)
@@ -207,6 +240,21 @@ namespace AngerRoom.Rewards
                 elapsed = 0f;
                 collectionStartPosition = pointsText.transform.localPosition;
             }
+        }
+
+        private AudioClip GetCollectionClip(int points)
+        {
+            return points == 10 ? minimumRewardCollectionClip : rewardCollectionClip;
+        }
+
+        private void UpdatePointsColor()
+        {
+            // Use the same clock/frequency as the vertical wobble. Cosine mapped
+            // to 0..1 starts white, reaches the attempt colour halfway through
+            // the cycle, then smoothly returns to white. It never accumulates.
+            float phase = animationTime * wobbleFrequency * Mathf.PI * 2f;
+            float blend = (1f - Mathf.Cos(phase)) * 0.5f;
+            pointsText.color = Color.Lerp(Color.white, attemptColor, blend);
         }
     }
 }

@@ -115,3 +115,27 @@ These Unity renders show the Shooting reward with the supplied lock icons and th
 ### Minigame reward rotation
 
 Idle rotation now swings around the initial Y orientation using a sine wave. Rotation Amplitude defaults to 30 degrees (limits of -30 and +30); Rotation Frequency defaults to 0.25 cycles per second (one full cycle every four seconds). Floating movement is unchanged. Collection starts its full spin at the current swing angle, then accelerates towards Collect Spin Speed as the text disappears.
+
+### Points colour and collection sounds (2026-10-30)
+
+MinigameRewardBox now owns the points text colour. GamesManager supplies the remaining attempts; it no longer writes a competing fixed colour after a failure. The four Inspector colours correspond to 3 attempts (green), 2 (yellow), 1 (red), and 0 (dark grey). All are fully opaque by default.
+
+The colour uses the same clock and Wobble Frequency as vertical movement. `(1 - cos(phase)) / 2` produces a smooth 0-to-1-to-0 blend: white at the start, the attempt colour halfway through, then white again. `Color.Lerp` applies that blend each frame. Setting Wobble Frequency to zero also stops the colour pulse at white. Rotation Frequency still controls the separate left/right swing.
+
+On each reward pedestal, expand **Collection audio (optional)** on MinigameRewardBox:
+
+- **Reward Collection Clip**: sound for collecting 100, 70, or 40 points.
+- **Minimum Reward Collection Clip**: sound for collecting 10 points.
+- **Collection Volume**: playback gain, initially 0.5.
+
+Drag audio assets into these slots when available. Empty slots are valid and silent. The clip plays only after the disappearance animation successfully awards the points, rather than every time a tracked hand enters the reach radius. PlayClipAtPoint creates a temporary 3D source at the text position, so hiding the points does not cut the sound off. This temporary source uses Unity's default audio routing; it is not connected to a custom mixer group.
+
+### Overall timeout settlement (2026-10-30)
+
+When the overall experiment timer ends, each unfinished minigame becomes worth 10 points. GamesManager awards these immediately through TryCollectReward, whose duplicate guard remains shared with physical collection. RewardChanged makes the matching box deactivate its points GameObject. The box and pedestal remain present; automatic settlement does not play a grab sound.
+
+Completed minigames and those already exhausted after three failures retain their rewards and existing collection status. In particular, a completed but uncollected reward stays available at its earned value. The timeout does not invent additional logged attempts: experimentExpired marks the session ended and prevents late win/failure callbacks from altering the settled values. All remaining start controls are disabled and blacklisted immediately.
+
+Original scripts for this change are preserved outside Assets in `Backups/RewardFeedback/2026-10-30`. Headset testing should check colour readability, the sound position once clips are assigned, and timeout during an unfinished minigame.
+
+Unity batch validation passed 342 checks after this update, including the four colour cycles, optional clip selection, all unfinished timeout values, preservation of completed rewards, hidden timeout points objects, and duplicate/late callback protection. No scene was saved by the validation utility.

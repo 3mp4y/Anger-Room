@@ -76,6 +76,10 @@ public static class PhysicalRewardValidation
             Call(manager, "Awake");
             Call(manager, "Start");
             Call(scoreboard, "Start");
+            // Edit-mode batch checks must explicitly run lifecycle setup. The
+            // timeout branch plays the localized loss clip initialized in Start.
+            Call(manager.am, "Awake");
+            Call(manager.am, "Start");
             var scores = (TextMeshPro[])Get(manager, "scores");
             foreach (var box in boxes)
             {
@@ -165,6 +169,85 @@ public static class PhysicalRewardValidation
             Check(PlayerPoints(scoreboard) == animationBefore + 100, "Animation did not award once");
             Call(animated, "Update");
             Check(PlayerPoints(scoreboard) == animationBefore + 100, "Animation awarded twice");
+            // Colour endpoints are deterministic even when the frame rate changes.
+            string[] colorFields = { "threeAttemptsColor", "twoAttemptsColor", "oneAttemptColor", "noAttemptsColor" };
+            float frequency = (float)Get(animated, "wobbleFrequency");
+            for (int failures = 0; failures <= 3; failures++)
+            {
+                Set(manager, "gameTries", new[] { 0, failures, 0 });
+                Set(animated, "animationTime", 0f);
+                Call(animated, "RefreshReward");
+                Check(points.color == Color.white, "Colour cycle must start white");
+                Set(animated, "animationTime", .5f / frequency);
+                Call(animated, "UpdatePointsColor");
+                Check(points.color == (Color)Get(animated, colorFields[failures]), "Wrong attempt colour at half-cycle");
+                Set(animated, "animationTime", 1f / frequency);
+                Call(animated, "UpdatePointsColor");
+                Check(points.color == Color.white, "Colour cycle did not return to white");
+            }
+            var normalClip = AudioClip.Create("Normal reward test", 100, 1, 44100, false);
+            var minimumClip = AudioClip.Create("Minimum reward test", 100, 1, 44100, false);
+            Set(animated, "rewardCollectionClip", normalClip);
+            Set(animated, "minimumRewardCollectionClip", minimumClip);
+            var chooseClip = typeof(MinigameRewardBox).GetMethod("GetCollectionClip", Flags);
+            foreach (int value in new[] { 100, 70, 40 })
+                Check((AudioClip)chooseClip.Invoke(animated, new object[] { value }) == normalClip, "Wrong normal collection clip");
+            Check((AudioClip)chooseClip.Invoke(animated, new object[] { 10 }) == minimumClip, "Wrong minimum collection clip");
+            Set(animated, "minimumRewardCollectionClip", null);
+            Check(chooseClip.Invoke(animated, new object[] { 10 }) == null, "Unassigned optional clip must remain silent");
+            Set(animated, "rewardCollectionClip", null);
+            UnityEngine.Object.DestroyImmediate(normalClip);
+            UnityEngine.Object.DestroyImmediate(minimumClip);
+
+            // Exercise the real timer expiry branch, including repeat/late callbacks.
+            // Each unfinished starting value (100/70/40) must become an automatic 10.
+            for (int failures = 0; failures < 3; failures++)
+            {
+                Set(manager, "experimentExpired", false);
+                Set(manager, "gameTries", new[] { 0, 1, failures });
+                Set(manager, "gamePoints", new[] { 100, 70, 100 - 30 * failures });
+                Set(manager, "wins", new[] { 1, 1, 0 });
+                var collected = (bool[])Get(manager, "collectedRewards");
+                Array.Clear(collected, 0, 3);
+                collected[0] = true;
+                foreach (var box in boxes)
+                {
+                    ((TMP_Text)Get(box, "pointsText")).gameObject.SetActive(true);
+                    SetState(box, "Locked");
+                    Call(box, "RefreshReward");
+                }
+                int beforeTimeout = PlayerPoints(scoreboard);
+                Set(manager, "time_left_exp", 0f);
+                Set(manager, "isgoing", true);
+                var timer = (System.Collections.IEnumerator)typeof(GamesManager).GetMethod("OverallTimer", Flags).Invoke(manager, null);
+                timer.MoveNext();
+                Check(PlayerPoints(scoreboard) == beforeTimeout + 10, "Timeout did not award exactly ten for unfinished game");
+                Check(manager.GetRewardPoints(2) == 10 && manager.IsRewardCollected(2), "Timeout reward not settled");
+                Check(!((TMP_Text)Get(boxes[2], "pointsText")).gameObject.activeSelf, "Timeout points object still visible");
+                Check(manager.GetRewardPoints(0) == 100 && manager.GetRewardPoints(1) == 70, "Timeout changed completed values");
+                Check(manager.CanCollectReward(1) && ((TMP_Text)Get(boxes[1], "pointsText")).gameObject.activeSelf, "Timeout removed completed uncollected reward");
+                manager.GameWon(2);
+                manager.addTries(2, message);
+                Call(manager, "ExpireExperiment");
+                manager.StartOverAllTimer();
+                Check(!manager.TryCollectReward(2) && PlayerPoints(scoreboard) == beforeTimeout + 10, "Late callback or repeated expiry awarded again");
+                manager.stoppedPlaying();
+                Check(manager._activationList.All(button => !button.activeSelf), "Late callback restored expired controls");
+            }
+            Set(manager, "experimentExpired", false);
+            Set(manager, "wins", new[] { 0, 0, 0 });
+            Set(manager, "gameTries", new[] { 0, 1, 2 });
+            Set(manager, "gamePoints", new[] { 100, 70, 40 });
+            Array.Clear((bool[])Get(manager, "collectedRewards"), 0, 3);
+            int allBefore = PlayerPoints(scoreboard);
+            Call(manager, "ExpireExperiment");
+            Check(PlayerPoints(scoreboard) == allBefore + 30, "Three unfinished games must award thirty total");
+            Set(manager, "experimentExpired", false);
+            Set(manager, "gameTries", new[] { 3, 3, 3 });
+            Array.Clear((bool[])Get(manager, "collectedRewards"), 0, 3);
+            allBefore = PlayerPoints(scoreboard);
+            Call(manager, "ExpireExperiment");
+            Check(PlayerPoints(scoreboard) == allBefore && manager.CanCollectReward(0), "Already exhausted rewards must retain physical collection");
             File.WriteAllText("Logs/PhysicalRewardChecks/result.txt", "PASS: " + checks + " checks. Headset reach/poke still requires hardware testing.");
             Debug.Log("PHYSICAL_REWARDS_PASS " + checks);
             EditorApplication.Exit(0);

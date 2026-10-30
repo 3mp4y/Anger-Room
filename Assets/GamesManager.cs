@@ -23,11 +23,12 @@ public class GamesManager : MonoBehaviour
     // GamesManager owns the reward value and collection permission. The physical
     // boxes only display/animate it; they never calculate or award points themselves.
     private readonly bool[] collectedRewards = new bool[3];
+    private bool experimentExpired;
     public event System.Action<int> RewardChanged;
 
     public int GetRewardPoints(int game) => IsValidGame(game) ? gamePoints[game] : 0;
     public bool IsRewardCollected(int game) => IsValidGame(game) && collectedRewards[game];
-    public bool IsGameResolved(int game) => IsValidGame(game) && (wins[game] == 1 || gameTries[game] >= 3);
+    public bool IsGameResolved(int game) => IsValidGame(game) && (experimentExpired || wins[game] == 1 || gameTries[game] >= 3);
     public bool CanCollectReward(int game) => IsGameResolved(game) && !collectedRewards[game];
     private bool IsValidGame(int game) => game >= 0 && game < gamePoints.Length;
 
@@ -71,6 +72,7 @@ public class GamesManager : MonoBehaviour
 
     public void StartOverAllTimer()
     {
+        if (isgoing || experimentExpired) return;
         stoppedPlaying();
         isgoing = true;
         StartCoroutine(OverallTimer());
@@ -88,14 +90,41 @@ public class GamesManager : MonoBehaviour
             }
             else
             {
-            foreach (GameObject realButton in realButtons) {
-            _reactivationBlacklist.Add(realButton);
-            }
-            DeactivatingButtons();
+            ExpireExperiment();
             am.playLoss();
-            isgoing = false;
             }
             yield return null;
+        }
+    }
+
+    private void ExpireExperiment()
+    {
+        // Close the session before publishing reward events. A minigame still
+        // finishing its own animation cannot report a late win or extra failure.
+        if (experimentExpired) return;
+        experimentExpired = true;
+        isgoing = false;
+        time_left_exp = 0f;
+        TMPtime_left_exp.text = "00:00";
+        StopLoop();
+        am.clock.Stop();
+
+        // DeactivatingButtons is an IEnumerator: calling it without starting a
+        // coroutine does nothing. At timeout, disable these controls immediately
+        // and blacklist them so a late stoppedPlaying callback cannot restore them.
+        foreach (GameObject button in _activationList) PermanentlyDeactivate(button);
+        foreach (GameObject button in realButtons)
+            if (!_reactivationBlacklist.Contains(button)) PermanentlyDeactivate(button);
+
+        for (int game = 0; game < gamePoints.Length; game++)
+        {
+            // Keep completed results (including uncollected rewards) unchanged.
+            // Only unfinished minigames receive the automatic ten-point fallback.
+            if (wins[game] == 1 || gameTries[game] >= 3 || collectedRewards[game]) continue;
+            gamePoints[game] = 10;
+            // Reuse the normal exactly-once award path. RewardChanged tells the
+            // box to hide its points object; no reach animation or sound is needed.
+            TryCollectReward(game);
         }
     }
     
@@ -175,19 +204,19 @@ public class GamesManager : MonoBehaviour
         logger.Log("Participant lost game id:" + i + " for the " + gameTries[i] + " time");
         switch(gameTries[i])
         {
-            case 1: scores[i].color = new Color32(217, 209, 0, 255);
+            case 1:
                     //scores[i].text = string.Format("70pts");
                     //scores2[i].color = new Color(217, 209, 0, 255);
                     //scores2[i].text = string.Format("70pts");
                     StartCoroutine(lossMessage(gameTries[i], false, message, textAdapter));
                     break;
-            case 2: scores[i].color = new Color32(240, 10, 10, 255);
+            case 2:
                     //scores[i].text = string.Format("40pts");
                     //scores2[i].color = new Color32(240, 10, 10, 255);
                     //scores2[i].text = string.Format("50pts");
                     StartCoroutine(lossMessage(gameTries[i], false, message, textAdapter));
                     break;
-            case 3: scores[i].color = new Color32(132, 132, 132, 200);
+            case 3:
                     //scores[i].text = string.Format("10pts");
                     //scores2[i].color = new Color32(132, 132, 132, 200);
                     //scores2[i].text = string.Format("10pts");
@@ -226,6 +255,7 @@ public class GamesManager : MonoBehaviour
 
     public int getRemainingTries(int game)
     {
+        if (experimentExpired && wins[game] != 1) return 0;
         return 3-gameTries[game];
     }
     public void CheckLost()
