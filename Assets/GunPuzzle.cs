@@ -22,34 +22,6 @@ public class GunPuzzle : MonoBehaviour
     [SerializeField] TextMeshPro TMPTimer;
     [SerializeField] TextMeshPro TMPLevel;
     [SerializeField] TextMeshPro TMPScore;
-    [Header("Shooting readout comparison")]
-    [UnityEngine.Serialization.FormerlySerializedAs("leftControllerReadout")]
-    [SerializeField] private Readout screenReadout = new Readout();
-    [SerializeField] private Readout centerEyeReadout = new Readout();
-    private bool readoutsActive;
-
-    [System.Serializable]
-    private sealed class Readout
-    {
-        [Tooltip("Show this layout during shooting practice and timed rounds.")]
-        [SerializeField] private bool show = true;
-        [SerializeField] private GameObject root;
-        [SerializeField] private TMP_Text levelLabel, hitsLabel, timerLabel;
-
-        public void Refresh(bool active, TMP_Text level, TMP_Text hits, TMP_Text timer)
-        {
-            if (root == null) return;
-            bool visible = active && show;
-            if (root.activeSelf != visible) root.SetActive(visible);
-            if (!visible) return;
-
-            // Mirror the existing localized strings, including the countdown
-            // between levels. These panels never calculate score or time.
-            levelLabel.text = level.text;
-            hitsLabel.text = hits.text;
-            timerLabel.text = timer.text;
-        }
-    }
     [Tooltip("The Text (TMP) child of EndTut, including when EndTut is inactive.")]
     [SerializeField] private TMP_Text endTutorialText;
     public float puzzleTimer;
@@ -105,7 +77,6 @@ public class GunPuzzle : MonoBehaviour
     }
     public void Reset()
     {
-        readoutsActive = false;
         foreach (GameObject obj in ObjectsToDeactivateWhilePlaying)
         {
             obj.SetActive(true);
@@ -118,7 +89,6 @@ public class GunPuzzle : MonoBehaviour
     }
     public void StartGun()
     {   
-        readoutsActive = true;
         shoot_script.failureChance = angerVar ? 10 : 0;
         Begin();
         fakegun.SetActive(false);
@@ -162,7 +132,6 @@ public class GunPuzzle : MonoBehaviour
 
     public void StartTutorial2()
     {
-        readoutsActive = true;
         tutorial = true;
         gm.DoneTutorial(1);
         gm.Playing();
@@ -318,20 +287,5 @@ public class GunPuzzle : MonoBehaviour
     public bool GetGunTutorial()
     {
         return tutorial;
-    }
-
-    private void LateUpdate()
-    {
-        // Update and the level-transition coroutine have both set the table text by now.
-        screenReadout.Refresh(readoutsActive, TMPLevel, TMPScore, TMPTimer);
-        centerEyeReadout.Refresh(readoutsActive, TMPLevel, TMPScore, TMPTimer);
-    }
-
-    private void OnDisable()
-    {
-        // The panels live elsewhere in the scene, so disabling this component alone
-        // wouldn't hide them. LateUpdate will restore them if the session resumes.
-        screenReadout.Refresh(false, TMPLevel, TMPScore, TMPTimer);
-        centerEyeReadout.Refresh(false, TMPLevel, TMPScore, TMPTimer);
     }
 }
