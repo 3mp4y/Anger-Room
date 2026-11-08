@@ -26,6 +26,7 @@ public class GunPuzzle : MonoBehaviour
     [UnityEngine.Serialization.FormerlySerializedAs("leftControllerReadout")]
     [SerializeField] private Readout screenReadout = new Readout();
     [SerializeField] private Readout centerEyeReadout = new Readout();
+    [SerializeField] private Readout OldTexts = new Readout();
     private bool readoutsActive;
 
     [System.Serializable]
@@ -325,6 +326,7 @@ public class GunPuzzle : MonoBehaviour
         // Update and the level-transition coroutine have both set the table text by now.
         screenReadout.Refresh(readoutsActive, TMPLevel, TMPScore, TMPTimer);
         centerEyeReadout.Refresh(readoutsActive, TMPLevel, TMPScore, TMPTimer);
+        OldTexts.Refresh(readoutsActive, TMPLevel, TMPScore, TMPTimer);
     }
 
     private void OnDisable()
@@ -333,5 +335,7 @@ public class GunPuzzle : MonoBehaviour
         // wouldn't hide them. LateUpdate will restore them if the session resumes.
         screenReadout.Refresh(false, TMPLevel, TMPScore, TMPTimer);
         centerEyeReadout.Refresh(false, TMPLevel, TMPScore, TMPTimer);
+        OldTexts.Refresh(false, TMPLevel, TMPScore, TMPTimer);
+        
     }
 }
