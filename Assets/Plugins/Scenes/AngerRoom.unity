@@ -132433,7 +132433,7 @@ MonoBehaviour:
   - {fileID: 71824248}
   - {fileID: 167963527}
   - {fileID: 209122122}
-  angerEnabled: 0
+  angerEnabled: 1
   roundDurationSeconds: 16
   cardAudioSource: {fileID: 1604975278}
   cardFlipSound: {fileID: 8300000, guid: 745bd6c2ca44bc1409968733348fbe2c, type: 3}
@@ -140009,7 +140009,7 @@ MonoBehaviour:
   headAudio: {fileID: 1357735110}
   gm: {fileID: 1898069414}
   am: {fileID: 325308306}
-  angerVar: 0
+  angerVar: 1
   angerObstacles:
   - {fileID: 814311367}
   - {fileID: 1058293159}
@@ -171660,7 +171660,7 @@ MonoBehaviour:
   Spawner: {fileID: 1979904438}
   score_to_reach: 10
   shoot_script: {fileID: 1622301319}
-  angerVar: 0
+  angerVar: 1
 --- !u!1 &2134713481
 GameObject:
   m_ObjectHideFlags: 0
