@@ -135,6 +135,7 @@ MonoBehaviour:
   lineTime: 0.3
   intervalloSparo: 5
   timer: 0
+  _lineStartingWidth: 0.15
 --- !u!82 &5172545089698964908
 AudioSource:
   m_ObjectHideFlags: 0

@@ -34,20 +34,42 @@ public class LanguageAdapter : MonoBehaviour
     [SerializeField] private List<AudioClip> host_error_insults_ES;
     [SerializeField] private List<AudioClip> host_error_insults_ENG;
 
-    [Header("Host Loss Message")]
+    [Header("Ending: All Minigames Lost (after reward collection)")]
     [SerializeField] private List<AudioClip> host_loss_ITA;
     [SerializeField] private List<AudioClip> host_loss_ES;
     [SerializeField] private List<AudioClip> host_loss_ENG;
+
+    [Header("Ending: Time Ran Out")]
+    [SerializeField] private AudioClip hostTimeoutItalian;
+    [SerializeField] private AudioClip hostTimeoutSpanish;
+    [SerializeField] private AudioClip hostTimeoutEnglish;
+
+    [Header("Ending: Some Or All Minigames Won (after reward collection)")]
+    [UnityEngine.Serialization.FormerlySerializedAs("hostMixedResultsItalian")]
+    [SerializeField] private AudioClip hostCompletionItalian;
+    [UnityEngine.Serialization.FormerlySerializedAs("hostMixedResultsSpanish")]
+    [SerializeField] private AudioClip hostCompletionSpanish;
+    [UnityEngine.Serialization.FormerlySerializedAs("hostMixedResultsEnglish")]
+    [SerializeField] private AudioClip hostCompletionEnglish;
+
+    public AudioClip HostTimeout => currentLanguage switch
+    {
+        Language.Italian => hostTimeoutItalian,
+        Language.Spanish => hostTimeoutSpanish,
+        _ => hostTimeoutEnglish
+    };
+
+    public AudioClip HostCompletion => currentLanguage switch
+    {
+        Language.Italian => hostCompletionItalian,
+        Language.Spanish => hostCompletionSpanish,
+        _ => hostCompletionEnglish
+    };
 
     [Header("Audience Generic Insults")]
     [SerializeField] private List<AudioClip> audience_generci_insults_ITA;
     [SerializeField] private List<AudioClip> audience_generci_insults_ES;
     [SerializeField] private List<AudioClip> audience_generci_insults_ENG;
-
-    [Header("Audience Time Insults")]
-    [SerializeField] private List<AudioClip> audience_time_insults_ITA;
-    [SerializeField] private List<AudioClip> audience_time_insults_ES;
-    [SerializeField] private List<AudioClip> audience_time_insults_ENG;
 
     [Header("Audience Card Insults")]
     [SerializeField] private List<AudioClip> audience_card_insults_ITA;
@@ -121,9 +143,6 @@ public class LanguageAdapter : MonoBehaviour
 
     public List<AudioClip> AudienceGenericInsults 
         => GetLocalizedList(audience_generci_insults_ITA, audience_generci_insults_ES, audience_generci_insults_ENG);
-
-    public List<AudioClip> AudienceTimeInsults 
-        => GetLocalizedList(audience_time_insults_ITA, audience_time_insults_ES, audience_time_insults_ENG);
 
     public List<AudioClip> AudienceCardInsults 
         => GetLocalizedList(audience_card_insults_ITA, audience_card_insults_ES, audience_card_insults_ENG);

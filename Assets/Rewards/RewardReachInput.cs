@@ -7,14 +7,14 @@ namespace AngerRoom.Rewards
     {
         [Tooltip("TrackingSpace of the scene's OVRCameraRig. Keeps reach tests correct after teleporting.")]
         [SerializeField] private Transform trackingSpace;
+        [SerializeField] private GamesManager gamesManager;
 
         public bool IsReaching(Vector3 worldPosition, float radius)
         {
-            if (trackingSpace == null) return false;
-            return IsNear(OVRInput.Controller.LHand, worldPosition, radius) ||
-                   IsNear(OVRInput.Controller.RHand, worldPosition, radius) ||
-                   IsNear(OVRInput.Controller.LTouch, worldPosition, radius) ||
-                   IsNear(OVRInput.Controller.RTouch, worldPosition, radius);
+            if (trackingSpace == null || gamesManager == null) return false;
+            // This experiment uses one controller. An unused controller or a
+            // hand wearing sensors must not accidentally claim a reward.
+            return IsNear(gamesManager.ActiveController, worldPosition, radius);
         }
 
         private bool IsNear(OVRInput.Controller controller, Vector3 target, float radius)

@@ -16,6 +16,7 @@ public class CountDown : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (gm != null && gm.AcquisitionBlocked) return;
         int minutes = Mathf.FloorToInt(time_left / 60);
         int seconds = Mathf.FloorToInt(time_left % 60);
 

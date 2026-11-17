@@ -14,6 +14,7 @@ public class LaserSparatoLabirinto : MonoBehaviour
     public float lineTime = 0.3f;
     public float intervalloSparo = 5f; //tempo tra un laser e l'altro
     public float timer = 0f;
+    [SerializeField] float _lineStartingWidth;
 
     AudioSource thisAudio;
     // Start is called before the first frame update
@@ -25,6 +26,7 @@ public class LaserSparatoLabirinto : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (AngerRoom.Shimmer.AcquisitionGate.GameplayBlocked) return;
         // Contatore per sparare a intervalli regolari
         timer += Time.deltaTime;
         if (timer >= intervalloSparo)
@@ -36,6 +38,7 @@ public class LaserSparatoLabirinto : MonoBehaviour
 
     public void Shoot()
     {
+        if (AngerRoom.Shimmer.AcquisitionGate.GameplayBlocked) return;
         thisAudio.Play();
         Ray ray = new Ray(OrigineLaser.position, OrigineLaser.forward);
         // One raycast supplies both the visible endpoint and the gameplay hit.
@@ -55,7 +58,7 @@ public class LaserSparatoLabirinto : MonoBehaviour
             {
                 am.playBad(2);
                 logger.Log(gameObject.name);
-                Giocatore.transform.position = new Vector3 (InizioLabirinto.position.x, Giocatore.transform.position.y, InizioLabirinto.position.z);
+                PlatformTeleport.TryTeleport(Giocatore, InizioLabirinto);
             }
         }
         
@@ -63,7 +66,7 @@ public class LaserSparatoLabirinto : MonoBehaviour
         line.positionCount = 2;
         line.SetPosition(0, OrigineLaser.position);
         line.SetPosition(1, endPoint);
-        line.startWidth = 0.3f;
+        line.startWidth = _lineStartingWidth;
         //line.endWidth = 0.05f;
         Destroy(line.gameObject, lineTime);
 

@@ -8,6 +8,7 @@ namespace AngerRoom.Localization
         None = 0,
 
         Victory = 10,
+        OpeningPrompt = 11,
 
         LevelLabel = 20,
         RoundLabel = 21,
@@ -25,6 +26,7 @@ namespace AngerRoom.Localization
         NextLevelCountdown = 33,  // {0:00} seconds
         LabyrinthStatus = 34,     // {0} level, {1:00} minutes, {2:00} seconds
         LevelNumber = 35,         // {0} level number on a sign
+        PreparationCountdown = 36, // {0:00} seconds before the first shooting round
 
         AttemptFailed = 40,       // {0} remaining attempts
         GameDisabled = 41,
@@ -35,6 +37,18 @@ namespace AngerRoom.Localization
         // 60-63 were retired when reward buttons switched from words to icons.
         RewardCards = 64,
         RewardGun = 65,
-        RewardLabyrinth = 66
+        RewardLabyrinth = 66,
+
+        RulesLabel = 70,
+        NextLabel = 71,
+        ShootingTutorialGoal = 72,
+        ShootingTutorialTrail = 73,
+        LabyrinthTutorialGoal = 74,
+        LabyrinthTutorialObstacles = 75,
+        CardsTutorialFlip = 76,
+        CardsTutorialGoal = 77,
+        LabyrinthEscapeTitle = 78,
+        TargetShooterTitle = 79,
+        SubtitlePlaceholder = 80
     }
 }

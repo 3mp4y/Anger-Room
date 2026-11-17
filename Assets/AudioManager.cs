@@ -24,13 +24,48 @@ public class AudioManager : MonoBehaviour
     private List<AudioClip> host_time_insults;
     private List<AudioClip> host_error_insults;
     private List<AudioClip> host_loss;
+    private AudioClip completionClip;
+    private AudioClip timeoutClip;
+    private bool endingStarted;
     private List<AudioClip> audience_generic_insults;
-    private List<AudioClip> audience_time_insults;
     private List<AudioClip> audience_card_insults;
     private List<AudioClip> audience_gun_insults;
     private List<AudioClip> audience_lab_insults;
     private List<AudioClip>[] audience_specific_insults = new List<AudioClip>[3];
     private GameObject dialog;
+    Coroutine introductionRoutine;
+    bool openingNarrationSkipped;
+    public void SkipOpeningNarration()
+    {
+        openingNarrationSkipped = true;
+        if (introductionRoutine != null) StopCoroutine(introductionRoutine);
+        introductionRoutine = null;
+        host.Stop();
+        tutorial_index = host_intros.Count;
+    }
+    public void StopTutorialNarration()
+    {
+        StopAllCoroutines();
+        host.Stop();
+    }
+    private readonly List<AudioSource> acquisitionPausedSources = new List<AudioSource>();
+
+    public void PauseForAcquisition(bool cancelAttempt)
+    {
+        acquisitionPausedSources.Clear();
+        if (cancelAttempt) StopAllCoroutines();
+        foreach (var source in new[] { host, audienceLeft, audienceRight, clock, games[0], games[1], games[2] })
+        {
+            if (source == null) continue;
+            if (cancelAttempt) source.Stop();
+            else if (source.isPlaying) { source.Pause(); acquisitionPausedSources.Add(source); }
+        }
+    }
+    public void ResumeAfterAcquisition()
+    {
+        foreach (var source in acquisitionPausedSources) if (source != null) source.UnPause();
+        acquisitionPausedSources.Clear();
+    }
     
     [Header("Sounds")]
     [SerializeField] AudioClip bad;
@@ -61,9 +96,9 @@ public class AudioManager : MonoBehaviour
         host_time_insults = language_adapter.HostTimeInsults;
         host_error_insults = language_adapter.HostErrorInsults;
         host_loss =  language_adapter.HostLoss;
+        completionClip = language_adapter.HostCompletion;
+        timeoutClip = language_adapter.HostTimeout;
         audience_generic_insults = language_adapter.AudienceGenericInsults;
-        //audience_time_insults = language_adapter.AudienceTimeInsults;
-        audience_generic_insults = audience_time_insults;
         audience_card_insults = language_adapter.AudienceCardInsults;
         audience_gun_insults = language_adapter.AudienceGunInsults;
         audience_lab_insults = language_adapter.AudienceLabInsults;
@@ -82,18 +117,42 @@ public class AudioManager : MonoBehaviour
 
     public void FirstDialog()
     {
+        if (gm.AcquisitionBlocked || openingNarrationSkipped) return;
         dialog.SetActive(true);
     }
 
+   public void FirstAudioDialog(GameObject UI)
+{
+    if (gm.AcquisitionBlocked || openingNarrationSkipped) return;
+
+    StartCoroutine(PlayFirstAudioDialog(UI));
+}
+
+private IEnumerator PlayFirstAudioDialog(GameObject UI)
+{
+    host.PlayOneShot(host_intros[tutorial_index]);
+    
+    while (host.isPlaying || gm.AcquisitionBlocked)
+    {
+        yield return null;
+    }
+    
+    tutorial_index++;
+    
+    PlayIntro(UI);
+}
+
+
     public void PlayIntro(GameObject UI_button)
     {
-    StartCoroutine(Introduction(UI_button));
+    if (gm.AcquisitionBlocked || openingNarrationSkipped || tutorial_index >= host_intros.Count) return;
+    introductionRoutine = StartCoroutine(Introduction(UI_button));
     }
 
     private IEnumerator Introduction(GameObject UI_button)
     {
         host.PlayOneShot(host_intros[tutorial_index]);
-        while (host.isPlaying)
+        while (host.isPlaying || gm.AcquisitionBlocked)
             {
                 yield return null;
             }
@@ -154,12 +213,51 @@ public class AudioManager : MonoBehaviour
 
     public void playEnd()
     {
-        host.PlayOneShot(won);
+        StartEnding(completionClip);
     }
 
     public void playLoss()
     {
-        host.PlayOneShot(host_loss[0]);
+        StartEnding(host_loss != null && host_loss.Count > 0 ? host_loss[0] : null);
+    }
+
+    public void PlayTimeout()
+    {
+        StartEnding(timeoutClip);
+    }
+
+    private void StartEnding(AudioClip clip)
+    {
+        if (endingStarted) return;
+        endingStarted = true;
+        gm.BeginSessionEnding();
+        // An ending owns the host channel. Cancel queued insults and any current
+        // speech so neither can overlap the message or extend the completion wait.
+        StopAllCoroutines();
+        host.Stop();
+        audienceLeft.Stop();
+        audienceRight.Stop();
+        StartCoroutine(PlayEndingAndQuit(clip));
+    }
+
+    private IEnumerator PlayEndingAndQuit(AudioClip clip)
+    {
+        if (clip != null)
+        {
+            host.loop = false;
+            host.clip = clip;
+            host.Play();
+            // Pausing a source makes isPlaying false. Keep waiting during sensor
+            // recovery, then let the resumed message finish before closing.
+            yield return null;
+            while (host.isPlaying || gm.AcquisitionBlocked) yield return null;
+        }
+        else
+        {
+            Debug.LogWarning("Ending clip is not assigned. The session will close without narration.", this);
+            yield return null;
+        }
+        yield return gm.QuitAfterEnding();
     }
 
     public void playElevator()
@@ -178,10 +276,10 @@ public class AudioManager : MonoBehaviour
     }
 
     private bool CanPlayGenericInsults =>
-        gameConditions != null && gameConditions.AnyAngerEnabled;
+        !endingStarted && !gm.AcquisitionBlocked && gameConditions != null && gameConditions.AnyAngerEnabled;
 
     private bool CanPlaySpecificInsult(int game) =>
-        gameConditions != null && gameConditions.IsAngerEnabled(game);
+        !endingStarted && !gm.AcquisitionBlocked && gameConditions != null && gameConditions.IsAngerEnabled(game);
 
     private IEnumerator gen_insult()
     {

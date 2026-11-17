@@ -10,10 +10,21 @@ namespace AngerRoom.Localization
     [AddComponentMenu("Anger Room/Text Adapter")]
     public sealed class TextAdapter : MonoBehaviour
     {
+        [Serializable]
+        private sealed class SceneTextBinding
+        {
+            public TMPro.TMP_Text text;
+            public TextId id;
+        }
+
         [Tooltip("The same LanguageAdapter used by AudioManager. Set its language before Play Mode.")]
         [SerializeField] private LanguageAdapter languageAdapter;
         [Tooltip("The GameTexts asset containing translations for each TextId.")]
         [SerializeField] private TextCatalog catalog;
+        [Tooltip("Opening instruction outside the language-specific Dialog objects.")]
+        [SerializeField] private TMPro.TMP_Text openingPrompt;
+        [Tooltip("Static scene labels, including inactive tutorial panels. Applied once at startup; keep gameplay-updated readouts in their minigame scripts.")]
+        [SerializeField] private SceneTextBinding[] staticSceneTexts = Array.Empty<SceneTextBinding>();
 
         private Dictionary<TextId, string> sessionTexts;
         private LanguageAdapter.Language sessionLanguage;
@@ -32,6 +43,18 @@ namespace AngerRoom.Localization
         private void Awake()
         {
             EnsureInitialized();
+            if (openingPrompt != null) openingPrompt.text = Get(TextId.OpeningPrompt);
+            // Direct references also update inactive panels, before they first
+            // appear. Their saved Spanish preview does not set the session language.
+            foreach (SceneTextBinding binding in staticSceneTexts)
+            {
+                if (binding == null || binding.text == null || binding.id == TextId.None)
+                {
+                    Debug.LogWarning("Each static scene text needs a TMP reference and a TextId.", this);
+                    continue;
+                }
+                binding.text.text = Get(binding.id);
+            }
         }
 
         private void EnsureInitialized()

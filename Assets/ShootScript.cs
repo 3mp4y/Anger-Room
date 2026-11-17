@@ -9,7 +9,8 @@ public class ShootScript : MonoBehaviour
     public ParticleSystem smoke;
     public LayerMask mask;
     public LayerMask endTut;
-    public OVRInput.RawButton shootingButton;
+    [Tooltip("Controller-relative input: PrimaryIndexTrigger uses the selected hand's index trigger.")]
+    public OVRInput.Button shootingInput = OVRInput.Button.PrimaryIndexTrigger;
     public LineRenderer lineRend;
     public Transform shootingpoiint;
     public float maxLineDistance;
@@ -35,6 +36,7 @@ public class ShootScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (AngerRoom.Shimmer.AcquisitionGate.GameplayBlocked) return;
         if (reload)
         {
             timer += Time.deltaTime;
@@ -45,8 +47,12 @@ public class ShootScript : MonoBehaviour
         }
         }
 
-        if (OVRInput.GetDown(shootingButton) && !reload)
+        if (OVRInput.GetDown(shootingInput, gunpuz.gm.ActiveController) && !reload)
         {
+            // The debug panel stays usable while normal controller UI is off.
+            // Consume its click before gun effects, random misses or target hits.
+            if (gunpuz.gm.TryPressDebugButtonWithGun(
+                new Ray(shootingpoiint.position, shootingpoiint.forward), maxLineDistance)) return;
             Shoot();
             smoke.Play();
             //smoke.Emit(1000);
@@ -55,6 +61,7 @@ public class ShootScript : MonoBehaviour
 
     public void Shoot()
     {
+        if (AngerRoom.Shimmer.AcquisitionGate.GameplayBlocked) return;
         reload = true;
         am.playShot();
         Ray ray = new Ray(shootingpoiint.position, shootingpoiint.forward); //Inizializzi un laser "ray", position da dove parte il laser, forwward è la direzione BLU

@@ -1,0 +1,142 @@
+using System;
+using System.Collections;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using UnityEditor;
+using UnityEngine;
+using TMPro;
+
+// Batch-only checks of the saved button wiring and real controller methods.
+// Edit-mode coroutines do not tick; CompleteTransition advances the actual
+// blackout iterator across its wait explicitly. The scene is never saved.
+public static class LabyrinthButtonValidation
+{
+    const BindingFlags Flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+    static int checks;
+    static object Get(object o, string n) => o.GetType().GetField(n, Flags).GetValue(o);
+    static void Set(object o, string n, object v) => o.GetType().GetField(n, Flags).SetValue(o, v);
+    static object Call(object o, string n, params object[] args) => o.GetType().GetMethod(n, Flags).Invoke(o, args);
+    static void Check(bool value, string message) { if (!value) throw new Exception(message); checks++; }
+    static LabyrinthScript Load(bool anger)
+    {
+        typeof(LocalizationCompletionSetup).GetMethod("Load", BindingFlags.Static | BindingFlags.NonPublic)
+            .Invoke(null, new object[] { LanguageAdapter.Language.Spanish });
+        var lab = UnityEngine.Object.FindObjectsOfType<LabyrinthScript>(true).Single();
+        lab.angerVar = anger;
+        Call(lab, "Start");
+        return lab;
+    }
+    static object[] Levels(LabyrinthScript l) => ((IEnumerable)Get(l, "levels")).Cast<object>().ToArray();
+    static void CompleteTransition(LabyrinthScript l, int number)
+    {
+        object entry = number > 0 ? Levels(l)[number - 1] : null;
+        var dest = number > 0 ? (Transform)Get(entry, "destination") : number == 0 ? (Transform)Get(l, "tutorialDestination") : l.newPos;
+        var root = number > 0 ? (GameObject)Get(entry, "labyrinthRoot") : number == 0 ? (GameObject)Get(l, "tutorialRoot") : null;
+        float y = l.player.transform.position.y;
+        var routine = (IEnumerator)Call(l, "TeleportAfterBlackout", dest, root);
+        Check(routine.MoveNext() && routine.Current is WaitForSeconds, "Missing blackout wait");
+        Check(!routine.MoveNext(), "Transition did not finish");
+        Check(!(bool)Get(l, "transitioning") && !l.blacked.activeSelf, "Blackout/guard stuck");
+        Check(l.player.transform.position.y == y && Mathf.Abs(l.player.transform.position.x - dest.position.x) < .001f, "Teleport changed height or destination");
+        foreach (var settings in Levels(l))
+            Check(((GameObject)Get(settings, "labyrinthRoot")).activeSelf == ((GameObject)Get(settings, "labyrinthRoot") == root), "Wrong active labyrinth");
+    }
+    static void CheckAnger(LabyrinthScript l, int index)
+    {
+        var levels = Levels(l);
+        for (int i = 0; i < levels.Length; i++)
+            Check(((GameObject)Get(levels[i], "angerObstacles")).activeSelf == (l.angerVar && i == index), "Incorrect anger group " + i);
+    }
+    static void CheckWiring(LabyrinthScript l)
+    {
+        var expected = new[] { "BeginTutorial", "BeginLevel", "BeginLevel", "BeginLevel", "BeginLevel", "ReturnFromTutorial", "FinishMinigame" };
+        var found = new System.Collections.Generic.List<string>();
+        var numbers = new System.Collections.Generic.List<int>();
+        foreach (var c in l.GetComponentsInChildren<MonoBehaviour>(true).Where(c => c != null))
+        {
+            var so = new SerializedObject(c);
+            var calls = so.FindProperty("_whenUnselect.m_PersistentCalls.m_Calls");
+            if (calls == null || calls.arraySize == 0) continue;
+            var call = calls.GetArrayElementAtIndex(0);
+            if (call.FindPropertyRelative("m_Target").objectReferenceValue != l) continue;
+            Check(calls.arraySize == 1, "Button has multiple gameplay calls: " + c.name);
+            Check(so.FindProperty("_whenSelect.m_PersistentCalls.m_Calls").arraySize == 0, "Press event still changes gameplay");
+            string method = call.FindPropertyRelative("m_MethodName").stringValue;
+            Check(typeof(LabyrinthScript).GetMethod(method) != null, "Missing method " + method);
+            Check(call.FindPropertyRelative("m_CallState").intValue == 2, "Button event disabled");
+            found.Add(method);
+            if (method == "BeginLevel") numbers.Add(call.FindPropertyRelative("m_Arguments.m_IntArgument").intValue);
+        }
+        Check(found.OrderBy(x => x).SequenceEqual(expected.OrderBy(x => x)), "Wrong set of seven button actions");
+        Check(numbers.OrderBy(x => x).SequenceEqual(new[] { 1, 1, 2, 3 }), "Wrong level button arguments");
+        Check(Levels(l).Select(x => (float)Get(x, "duration")).SequenceEqual(new[] { 93f, 121f, 151f }), "Original migration durations changed");
+        foreach (var entry in Levels(l))
+        {
+            var root = (GameObject)Get(entry, "labyrinthRoot");
+            Check(root != null && ((Transform)Get(entry, "destination")).IsChildOf(root.transform) &&
+                ((GameObject)Get(entry, "angerObstacles")).transform.IsChildOf(root.transform), "Crossed level references");
+        }
+    }
+    public static void Run()
+    {
+        if (!Application.isBatchMode) throw new Exception("Batch only");
+        try
+        {
+            CheckWiring(Load(false));
+            foreach (bool anger in new[] { false, true })
+            {
+                var l = Load(anger); CheckAnger(l, -1);
+                l.BeginLevel(0); l.BeginLevel(2); l.BeginLevel(4); l.FinishMinigame();
+                Check(!(bool)Get(l, "started") && !l.gm.IsGameResolved(2), "Out-of-order entry accepted");
+                l.BeginTutorial(); l.BeginLevel(1);
+                Check(l.IsTutorialActive && (int)Get(l, "level") == 0, "Entry guard failed");
+                CompleteTransition(l, 0);
+                l.BeginLevel(1); CheckAnger(l, 0);
+                Check((float)Get(l, "time_left") == 93f && !l.IsTutorialActive, "Wrong first-level timer/state");
+                Set(l, "time_left", 90f); l.BeginLevel(1); l.BeginLevel(2);
+                Check((float)Get(l, "time_left") == 90f && (int)Get(l, "level") == 1, "Repeated event reset/advanced timer");
+                CompleteTransition(l, 1);
+                l.BeginLevel(3); l.FinishMinigame();
+                Check((int)Get(l, "level") == 1 && !l.gm.IsGameResolved(2), "Skipped level accepted");
+                l.BeginLevel(2); CheckAnger(l, 1);
+                Check((float)Get(l, "time_left") == 121f, "Wrong level-2 timer"); CompleteTransition(l, 2);
+                l.BeginLevel(3); CheckAnger(l, 2);
+                Check((float)Get(l, "time_left") == 151f, "Wrong level-3 timer"); CompleteTransition(l, 3);
+                l.FinishMinigame(); l.FinishMinigame();
+                Check(l.gm.IsGameResolved(2) && l.gm.CanCollectReward(2) && !l.gm.IsRewardCollected(2), "Win bypassed reward collection");
+                Check(!string.IsNullOrEmpty(((TMP_Text)Get(l, "congrats")).text), "Missing victory text");
+                CompleteTransition(l, -1); CheckAnger(l, -1);
+
+                l = Load(anger); // Direct theatre start, including a skipped tutorial.
+                for (int attempt = 0; attempt < 3; attempt++)
+                {
+                    l.BeginLevel(1); CheckAnger(l, 0);
+                    Check((float)Get(l, "time_left") == 93f, "Retry duration drifted");
+                    CompleteTransition(l, 1);
+                    Set(l, "time_left", 0f); Call(l, "Update");
+                    Check(((int[])Get(l.gm, "gameTries"))[2] == attempt + 1, "Failure counted incorrectly");
+                    CompleteTransition(l, -1); CheckAnger(l, -1);
+                }
+                Check(l.gm.CanCollectReward(2) && l.gm.GetRewardPoints(2) == 10, "Final failure did not unlock ten points");
+                l.BeginLevel(1); Check(!(bool)Get(l, "started"), "Exhausted minigame restarted");
+
+                l = Load(anger); l.BeginTutorial(); CompleteTransition(l, 0);
+                l.ReturnFromTutorial(); l.BeginLevel(1);
+                Check(!(bool)Get(l, "started"), "Start during return accepted");
+                CompleteTransition(l, -1);
+                l.BeginLevel(1); CheckAnger(l, 0);
+                l.gm.CancelAttemptForAcquisitionLoss();
+                Check(!(bool)Get(l, "transitioning") && !l.blacked.activeSelf && !(bool)Get(l, "started"), "Interrupted transition not canceled");
+                CheckAnger(l, -1);
+                Check(((int[])Get(l.gm, "gameTries"))[2] == 0, "Cancellation consumed attempt");
+                l.BeginLevel(1); Check((float)Get(l, "time_left") == 93f, "Canceled transition could not restart");
+            }
+            File.WriteAllText("Logs/labyrinth-button-validation.txt", "PASS " + checks + " checks. Saved scene unchanged during validation.");
+            Debug.Log("LABYRINTH_BUTTONS_PASS " + checks);
+            ResultDisplaySetup.ValidateDebugResults();
+            MinigameFlowValidation.Run();
+        }
+        catch (Exception e) { Debug.LogException(e); EditorApplication.Exit(1); }
+    }
+}

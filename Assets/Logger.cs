@@ -9,6 +9,7 @@ public class Logger : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if (AngerRoom.Shimmer.RecordingSession.Instance != null) return;
         string timestamp = System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
         _logPath = Application.persistentDataPath + "/log_" + timestamp + ".txt";
         Debug.Log(_logPath);
@@ -21,6 +22,11 @@ public class Logger : MonoBehaviour
 
     public void Log(string message)
     {
+        if (AngerRoom.Shimmer.RecordingSession.Instance != null)
+        {
+            AngerRoom.Shimmer.RecordingSession.Instance.LogApplication(message);
+            return;
+        }
         using (StreamWriter writer = new StreamWriter(_logPath, true))
         {
             writer.WriteLine(System.DateTime.Now + " - " + message);

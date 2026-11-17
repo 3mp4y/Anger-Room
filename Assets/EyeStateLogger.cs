@@ -4,7 +4,10 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using AngerRoom.Shimmer;
+using System.Globalization;
 
+[DefaultExecutionOrder(-300)]
 public class EyeStateLogger : MonoBehaviour
 {
     public static EyeStateLogger Instance;
@@ -73,6 +76,8 @@ public class EyeStateLogger : MonoBehaviour
     public bool HasStableData { get; private set; } = false;
     float _firstValidPacketAt = -1f;
     int _validPacketCount = 0;
+    double _observationSessionSeconds;
+    double _lastSdkSampleTime = double.NaN;
 
     private void Awake()
     {
@@ -102,6 +107,7 @@ public class EyeStateLogger : MonoBehaviour
 
         _eyeStarted = OVRPlugin.StartEyeTracking();
         Debug.Log($"StartEyeTracking() => {_eyeStarted}");
+        if (!_eyeStarted) yield break;
 
         if (debugHitPoint && _debugSphere == null)
         {
@@ -110,8 +116,12 @@ public class EyeStateLogger : MonoBehaviour
             _debugSphere.transform.localScale = Vector3.one * debugSphereSize;
 
             Renderer renderer = _debugSphere.GetComponent<Renderer>();
-            renderer.material = new Material(Shader.Find("Standard"));
-            renderer.material.color = debugSphereColor;
+            Shader markerShader = Shader.Find("Universal Render Pipeline/Lit");
+            if (markerShader != null)
+            {
+                renderer.material = new Material(markerShader);
+                renderer.material.color = debugSphereColor;
+            }
 
             Collider collider = _debugSphere.GetComponent<Collider>();
             Destroy(collider);
@@ -129,9 +139,13 @@ public class EyeStateLogger : MonoBehaviour
             _debugRay.endWidth = debugRayWidth;
             _debugRay.useWorldSpace = true;
 
-            Material mat = new Material(Shader.Find("Sprites/Default"));
-            mat.color = debugRayColor;
-            _debugRay.material = mat;
+            Shader rayShader = Shader.Find("Sprites/Default");
+            if (rayShader != null)
+            {
+                Material mat = new Material(rayShader);
+                mat.color = debugRayColor;
+                _debugRay.material = mat;
+            }
 
             _debugRay.startColor = debugRayColor;
             _debugRay.endColor = debugRayColor;
@@ -145,12 +159,12 @@ public class EyeStateLogger : MonoBehaviour
     void InitLogFile()
     {
         string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
-        _logPath = Application.persistentDataPath + "/eyegaze_" + timestamp + ".csv";
+        _logPath = RecordingSession.Instance != null ? Path.Combine(RecordingSession.Instance.Folder, "eyegaze.csv") :
+            Application.persistentDataPath + "/eyegaze_" + timestamp + ".csv";
         Debug.Log("Eye gaze log path: " + _logPath);
 
-        _writer = new StreamWriter(_logPath, false);
-        _writer.WriteLine(
-            "version,t,hp,hr,gaze,hit,obj,isValid,getSucceeded,eyeStarted,xrInitialized," +
+        _writer = RecordingCsv.Create(_logPath,
+            "session_id,session_time_s,observation_session_s,sample_session_s,time_source,clock_mapping_id,clock_bracket_half_width_s,gaze_age_s,sdk_time_repeated_or_backward,unity_frame,version,t,hp,hr,gaze,hit,obj,isValid,getSucceeded,eyeStarted,xrInitialized," +
             "hmdPresent,vrFocus,inputFocus,userPresent,eyeSupported,leftValid,rightValid," +
             "pluginTime,didHit,reason"
         );
@@ -160,6 +174,7 @@ public class EyeStateLogger : MonoBehaviour
 
     void Update()
     {
+        _observationSessionSeconds = RecordingSession.Instance != null ? RecordingSession.Instance.Now : double.NaN;
         if (!_eyeStarted)
         {
             ResetStableData();
@@ -227,6 +242,7 @@ public class EyeStateLogger : MonoBehaviour
     {
         var eyeGazesState = new OVRPlugin.EyeGazesState();
         bool getSucceeded = OVRPlugin.GetEyeGazesState(OVRPlugin.Step.Render, -1, ref eyeGazesState);
+        _observationSessionSeconds = RecordingSession.Instance != null ? RecordingSession.Instance.Now : double.NaN;
         bool leftValid = getSucceeded &&
                          eyeGazesState.EyeGazes != null &&
                          eyeGazesState.EyeGazes.Length > 0 &&
@@ -245,11 +261,19 @@ public class EyeStateLogger : MonoBehaviour
 
         Vector3 averageHeadRotation = head.forward.normalized;
 
-        Vector3 averageGazeDirection =
-            ((leftEyeGaze.transform.forward + rightEyeGaze.transform.forward) * 0.5f).normalized;
-
-        Vector3 averageGazePosition =
-            (leftEyeGaze.transform.position + rightEyeGaze.transform.position) * 0.5f;
+        // Use the poses from the same SDK snapshot as pluginTime, rather than
+        // OVREyeGaze transforms that may have been updated in a different frame.
+        Camera gazeCamera = Camera.main;
+        if (gazeCamera == null)
+        {
+            ResetStableData();
+            SendEyeStatusPacket(false, getSucceeded, leftValid, rightValid, eyeGazesState.Time, false, "main camera missing");
+            return;
+        }
+        var leftPose = eyeGazesState.EyeGazes[0].Pose.ToOVRPose().ToWorldSpacePose(gazeCamera);
+        var rightPose = eyeGazesState.EyeGazes[1].Pose.ToOVRPose().ToWorldSpacePose(gazeCamera);
+        Vector3 averageGazeDirection = ((leftPose.orientation * Vector3.forward + rightPose.orientation * Vector3.forward) * 0.5f).normalized;
+        Vector3 averageGazePosition = (leftPose.position + rightPose.position) * 0.5f;
 
         bool didHit = Physics.Raycast(
         averageGazePosition,
@@ -388,26 +412,42 @@ public class EyeStateLogger : MonoBehaviour
         if (_writer == null) return;
 
         var sb = new StringBuilder();
-        sb.Append(p.version).Append(',');
-        sb.Append(p.t).Append(',');
-        sb.Append(Csv(p.hp)).Append(',');
-        sb.Append(Csv(p.hr)).Append(',');
-        sb.Append(Csv(p.gaze)).Append(',');
-        sb.Append(Csv(p.hit)).Append(',');
-        sb.Append(Csv(p.obj)).Append(',');
-        sb.Append(p.isValid).Append(',');
-        sb.Append(p.getSucceeded).Append(',');
-        sb.Append(p.eyeStarted).Append(',');
-        sb.Append(p.xrInitialized).Append(',');
-        sb.Append(p.hmdPresent).Append(',');
-        sb.Append(p.vrFocus).Append(',');
-        sb.Append(p.inputFocus).Append(',');
-        sb.Append(p.userPresent).Append(',');
-        sb.Append(p.eyeSupported).Append(',');
-        sb.Append(p.leftValid).Append(',');
-        sb.Append(p.rightValid).Append(',');
-        sb.Append(p.pluginTime).Append(',');
-        sb.Append(p.didHit).Append(',');
+        var session = RecordingSession.Instance;
+        double mapped = 0;
+        bool hasMappedTime = session != null && p.getSucceeded &&
+            session.EyeClock.TryMap(p.pluginTime, _observationSessionSeconds, out mapped);
+        bool repeated = p.getSucceeded && p.pluginTime > 0 && p.pluginTime <= _lastSdkSampleTime;
+        if (p.getSucceeded && p.pluginTime > 0) _lastSdkSampleTime = p.pluginTime;
+        sb.Append(Csv(session?.SessionId)).Append(';');
+        sb.Append(session != null ? RecordingCsv.Number(hasMappedTime ? mapped : _observationSessionSeconds) : "").Append(';');
+        sb.Append(session != null ? RecordingCsv.Number(_observationSessionSeconds) : "").Append(';');
+        sb.Append(hasMappedTime ? RecordingCsv.Number(mapped) : "").Append(';');
+        sb.Append(hasMappedTime ? "sdk_mapped" : "observation_only").Append(';');
+        sb.Append(hasMappedTime ? session.EyeClock.Revision.ToString(CultureInfo.InvariantCulture) : "").Append(';');
+        sb.Append(hasMappedTime ? RecordingCsv.Number(session.EyeClock.HalfWidth) : "").Append(';');
+        sb.Append(hasMappedTime ? RecordingCsv.Number(_observationSessionSeconds - mapped) : "").Append(';');
+        sb.Append(repeated).Append(';');
+        sb.Append(Time.frameCount).Append(';');
+        sb.Append(p.version).Append(';');
+        sb.Append(p.t).Append(';');
+        sb.Append(Csv(p.hp)).Append(';');
+        sb.Append(Csv(p.hr)).Append(';');
+        sb.Append(Csv(p.gaze)).Append(';');
+        sb.Append(Csv(p.hit)).Append(';');
+        sb.Append(Csv(p.obj)).Append(';');
+        sb.Append(p.isValid).Append(';');
+        sb.Append(p.getSucceeded).Append(';');
+        sb.Append(p.eyeStarted).Append(';');
+        sb.Append(p.xrInitialized).Append(';');
+        sb.Append(p.hmdPresent).Append(';');
+        sb.Append(p.vrFocus).Append(';');
+        sb.Append(p.inputFocus).Append(';');
+        sb.Append(p.userPresent).Append(';');
+        sb.Append(p.eyeSupported).Append(';');
+        sb.Append(p.leftValid).Append(';');
+        sb.Append(p.rightValid).Append(';');
+        sb.Append(RecordingCsv.Number(p.pluginTime)).Append(';');
+        sb.Append(p.didHit).Append(';');
         sb.Append(Csv(p.reason));
 
         _writer.WriteLine(sb.ToString());
@@ -470,7 +510,7 @@ public class EyeStateLogger : MonoBehaviour
         if (Mathf.Abs(value) < 0.000005f)
             return "0";
 
-        return value.ToString("N5");
+        return value.ToString("F5", CultureInfo.InvariantCulture);
     }
 
     void CloseLogFile()
@@ -491,6 +531,7 @@ public class EyeStateLogger : MonoBehaviour
 
     void OnApplicationPause(bool pause)
     {
+        _lastSdkSampleTime = double.NaN;
         // Quest apps can be suspended without OnDestroy ever firing,
         // so flush whenever the app loses focus.
         if (pause && _writer != null)

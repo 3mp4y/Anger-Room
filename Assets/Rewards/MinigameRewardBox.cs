@@ -57,6 +57,25 @@ namespace AngerRoom.Rewards
         [SerializeField] private AudioClip minimumRewardCollectionClip;
         [SerializeField, Range(0f, 1f)] private float collectionVolume = 0.5f;
 
+        [Header("Available reward audio (optional)")]
+        [Tooltip("Loops from box unlock until the points are collected, including while the lid is closed.")]
+        [FormerlySerializedAs("floatingPointsClip")]
+        [SerializeField] private AudioClip rewardAvailableClip;
+        [FormerlySerializedAs("floatingPointsVolume")]
+        [Tooltip("Source volume, adjustable during Play. Unity supports 0 to 1; amplify a quiet clip through its import or mixer instead.")]
+        [SerializeField, Range(0f, 1f)] private float rewardAvailableVolume = 1f;
+        [Tooltip("Distance in metres within which the cue keeps its full source volume.")]
+        [SerializeField, Min(0.1f)] private float rewardNearDistance = 1.5f;
+        [Tooltip("Coverage radius in metres. Choose at least the distance to the farthest point of the stage.")]
+        [SerializeField, Min(0.2f)] private float rewardStageDistance = 25f;
+        [Tooltip("Fraction of source volume still audible at the coverage radius. Direction stays fully 3D.")]
+        [SerializeField, Range(0.05f, 1f)] private float rewardStageVolume = 0.65f;
+        [Tooltip("The cue fades to silence at this distance, beyond the stage coverage radius.")]
+        [SerializeField, Min(0.3f)] private float rewardFadeOutDistance = 40f;
+        private AudioSource floatingPointsSource;
+        private Vector4 appliedRewardDistances;
+        private float appliedRewardVolume = -1f;
+
         // A single state prevents repeated button presses from starting overlapping
         // animations, and repeated hand samples from collecting the same reward.
         private enum State { Locked, Ready, Opening, Rising, Available, Collecting, Collected }
@@ -87,6 +106,21 @@ namespace AngerRoom.Rewards
             initialTextPosition = pointsText.transform.localPosition;
             initialTextRotation = pointsText.transform.localRotation;
             initialTextScale = pointsText.transform.localScale;
+            // Use a dedicated source on the moving points, so this loop never
+            // interrupts the host or the collection sound. Missing clips are OK.
+            if (rewardAvailableClip != null)
+            {
+                floatingPointsSource = pointsText.gameObject.AddComponent<AudioSource>();
+                floatingPointsSource.playOnAwake = false;
+                floatingPointsSource.clip = rewardAvailableClip;
+                floatingPointsSource.loop = true;
+                floatingPointsSource.spatialBlend = 1f;
+                floatingPointsSource.spread = 0f;
+                floatingPointsSource.dopplerLevel = 0f;
+                floatingPointsSource.priority = 128;
+                floatingPointsSource.rolloffMode = AudioRolloffMode.Custom;
+                ApplyRewardAudioSettings();
+            }
             initialized = true;
             gamesManager.RewardChanged += OnRewardChanged;
             if (minigameLabel != null)
@@ -107,6 +141,52 @@ namespace AngerRoom.Rewards
             // If a station was temporarily hidden, reconcile any score change
             // immediately. Update-based animation resumes instead of losing a coroutine.
             if (initialized) RefreshReward();
+        }
+
+        private void OnDisable()
+        {
+            if (floatingPointsSource != null) floatingPointsSource.Stop();
+        }
+
+        private void UpdateFloatingAudio()
+        {
+            if (floatingPointsSource == null) return;
+            ApplyRewardAudioSettings();
+            bool shouldPlay = isActiveAndEnabled && pointsText.gameObject.activeInHierarchy &&
+                !gamesManager.AcquisitionBlocked && !gamesManager.SessionEnding &&
+                state != State.Locked && state != State.Collected;
+            if (shouldPlay && !floatingPointsSource.isPlaying) floatingPointsSource.Play();
+            else if (!shouldPlay && floatingPointsSource.isPlaying) floatingPointsSource.Stop();
+        }
+
+        private void ApplyRewardAudioSettings()
+        {
+            float volume = Mathf.Clamp01(rewardAvailableVolume);
+            if (volume != appliedRewardVolume)
+            {
+                floatingPointsSource.volume = volume;
+                appliedRewardVolume = volume;
+            }
+
+            // Keep distances ordered even while editing the Inspector in Play.
+            // The sound stays at its real position: only distance attenuation is
+            // gentler. We do not move the source to the listener or mix in 2D audio.
+            float near = Mathf.Max(0.1f, rewardNearDistance);
+            float stage = Mathf.Max(near + 0.1f, rewardStageDistance);
+            float fadeOut = Mathf.Max(stage + 0.1f, rewardFadeOutDistance);
+            float stageVolume = Mathf.Clamp(rewardStageVolume, 0.05f, 1f);
+            var distances = new Vector4(near, stage, fadeOut, stageVolume);
+            if (distances == appliedRewardDistances) return;
+            appliedRewardDistances = distances;
+            floatingPointsSource.minDistance = near;
+            floatingPointsSource.maxDistance = fadeOut;
+            // Unity scales a custom curve's horizontal 0..1 range by maxDistance.
+            // Full volume nearby -> still clearly present across the stage ->
+            // silence outside the coverage area. Zero tangents make smooth fades.
+            // Rebuild only when settings change, not on every animation frame.
+            floatingPointsSource.SetCustomCurve(AudioSourceCurveType.CustomRolloff,
+                new AnimationCurve(new Keyframe(0f, 1f), new Keyframe(near / fadeOut, 1f),
+                    new Keyframe(stage / fadeOut, stageVolume), new Keyframe(1f, 0f)));
         }
 
         private void OnRewardChanged(int changedGame)
@@ -138,6 +218,7 @@ namespace AngerRoom.Rewards
                 state = ready ? State.Ready : State.Locked;
                 SetButton(ready);
             }
+            UpdateFloatingAudio();
         }
 
         private void SetButton(bool unlocked)
@@ -153,6 +234,7 @@ namespace AngerRoom.Rewards
         // Bound to the physical Meta poke button's Select event in the scene.
         public void OpenBox()
         {
+            if (gamesManager != null && (gamesManager.AcquisitionBlocked || gamesManager.SessionEnding)) return;
             if (!initialized || state != State.Ready || !gamesManager.CanCollectReward(gameIndex)) return;
             state = State.Opening;
             elapsed = 0f;
@@ -162,6 +244,7 @@ namespace AngerRoom.Rewards
         private void Update()
         {
             if (!initialized || state == State.Collected) return;
+            UpdateFloatingAudio();
             float dt = Time.deltaTime;
             animationTime += dt;
             elapsed += dt;
@@ -195,6 +278,8 @@ namespace AngerRoom.Rewards
                 pointsText.transform.localScale = initialTextScale * (1f - Mathf.SmoothStep(0f, 1f, t));
                 if (t >= 1f)
                 {
+                    // Visual motion may finish during an outage; defer the score transaction.
+                    if (gamesManager.AcquisitionBlocked || gamesManager.SessionEnding) return;
                     // This is the only award request, at the end of the disappearance.
                     // GamesManager independently guards ownership and duplicate awards.
                     int awardedPoints = gamesManager.GetRewardPoints(gameIndex);
@@ -231,7 +316,7 @@ namespace AngerRoom.Rewards
 
             // Closed/opening/rising boxes cannot be collected. This tests tracked
             // hand/controller positions, not the head or an arbitrary Player collider.
-            if (state == State.Available && reachInput.IsReaching(pointsText.transform.position, reachRadius))
+            if (state == State.Available && !gamesManager.AcquisitionBlocked && !gamesManager.SessionEnding && reachInput.IsReaching(pointsText.transform.position, reachRadius))
             {
                 // Start the fast collection spin at the visible swing angle,
                 // avoiding a rotation jump when the hand reaches the reward.
@@ -240,6 +325,7 @@ namespace AngerRoom.Rewards
                 elapsed = 0f;
                 collectionStartPosition = pointsText.transform.localPosition;
             }
+            UpdateFloatingAudio();
         }
 
         private AudioClip GetCollectionClip(int points)

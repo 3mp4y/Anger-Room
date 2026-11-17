@@ -6,6 +6,7 @@ using System.Text;
 
 public class ScoreboardManager : MonoBehaviour
 {
+    [SerializeField] private AngerRoom.Localization.TextAdapter textAdapter;
     [SerializeField] private TMP_Text textA;
     [SerializeField] private TMP_Text textB;
 
@@ -80,7 +81,7 @@ public class ScoreboardManager : MonoBehaviour
 
     private string FormatEntry(Participant p, int rank)
     {
-        return $"Participant {p.id}: {p.points}pts - {rank}°";
+        return textAdapter.Format(AngerRoom.Localization.TextId.ScoreboardEntry, p.id, p.points, rank);
     }
 
     private string _scoreboardText;

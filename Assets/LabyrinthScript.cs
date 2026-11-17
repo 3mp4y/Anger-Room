@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using AngerRoom.Localization;
 using UnityEngine;
@@ -5,134 +6,208 @@ using TMPro;
 
 public class LabyrinthScript : MonoBehaviour
 {
+    [Serializable]
+    private sealed class LevelSettings
+    {
+        public GameObject labyrinthRoot;
+        public Transform destination;
+        [Tooltip("Total countdown, including the existing three-second blackout.")]
+        [Min(3f)] public float duration;
+        public GameObject angerObstacles;
+    }
+
     public GameObject blacked;
     public GameObject player;
     public Transform newPos;
     [SerializeField] TextMeshPro TMPTimer;
     [SerializeField] TextMeshPro congrats;
-    [Tooltip("The shared TextAdapter on the AudioManager object.")]
     [SerializeField] private TextAdapter textAdapter;
     [SerializeField] private TMP_Text startButtonText;
     [SerializeField] private TMP_Text tutorialSignText;
-    [Tooltip("The signs inside labyrinths 1, 2 and 3, in that order.")]
     [SerializeField] private TMP_Text[] levelSigns = new TMP_Text[3];
-    [SerializeField] float puzzleTimer;
-    private float time_left;
-    [SerializeField] bool started = false;
+    [Header("Tutorial")]
+    [SerializeField] private GameObject tutorialRoot;
+    [SerializeField] private Transform tutorialDestination;
+    [Header("Levels - first, second, third")]
+    [SerializeField] private LevelSettings[] levels = new LevelSettings[3];
+    [SerializeField] private Logger logger;
     public AudioSource headAudio;
     public GamesManager gm;
     public AudioManager am;
     public bool angerVar;
-    // Read-only access for GameConditions; the existing Inspector flag stays here.
     public bool AngerEnabled => angerVar;
+
+    private float time_left;
+    private float initialPuzzleTimer;
+    private bool started;
+    private bool inLabyrinth;
+    private bool transitioning;
     private int level;
-    [SerializeField] GameObject[] angerObstacles = new GameObject[3];
-   
-    // Start is called before the first frame update
+    public bool IsTutorialActive => inLabyrinth && !started;
+    private bool CanInteract => !transitioning && !gm.AcquisitionBlocked && !gm.SessionEnding;
+
     void Start()
     {
-        time_left = puzzleTimer;
+        initialPuzzleTimer = levels[0].duration;
+        time_left = initialPuzzleTimer;
         congrats.text = string.Empty;
-        level = 1;
-        // These labels need translating only once: the adapter keeps the language
-        // selected before Play. Direct references also work for inactive signs.
+        // Inactive labyrinths remember their children's activeSelf state.
+        // Entering a level always reapplies angerVar, including after debug skips.
+        SetAngerObstacles(-1);
+        ShowOnlyLabyrinth(null);
         startButtonText.text = textAdapter.Get(TextId.TutorialLabel);
         tutorialSignText.text = textAdapter.Get(TextId.TutorialLabel);
         for (int i = 0; i < levelSigns.Length; i++)
-        {
             levelSigns[i].text = textAdapter.Format(TextId.LevelNumber, i + 1);
-        }
     }
 
-    // The tutorial button's UnityEvents call these instead of assigning English
-    // strings directly to TMP. Keep these public methods available to the scene.
-    public void ShowStartButtonLabel()
-    {
-        startButtonText.text = textAdapter.Get(TextId.StartLabel);
-    }
+    public void ShowStartButtonLabel() => startButtonText.text = textAdapter.Get(TextId.StartLabel);
+    public void ShowTutorialTimerLabel() => TMPTimer.text = textAdapter.Get(TextId.TimerLabel);
+    public void ShowDebugResult(bool won) => congrats.text = textAdapter.Get(won ? TextId.Victory : TextId.GameDisabled);
 
-    public void ShowTutorialTimerLabel()
+    public void BeginTutorial()
     {
-        TMPTimer.text = textAdapter.Get(TextId.TimerLabel);
-    }
-
-    public void SetStarted(bool x)
-    {
-        started = x;
-    } 
-    
-    public void TpLabirinth(Transform x)
-    {
-        time_left = puzzleTimer;
-        StartCoroutine(DarkenerTeleport(x));
-    }
-    
-    public void LastButton()
-    {
-        congrats.text = textAdapter.Get(TextId.Victory);
+        if (!CanInteract || inLabyrinth || !gm.BeginAttempt(2, true)) return;
+        level = 0;
+        inLabyrinth = true;
         started = false;
-        StartCoroutine(DarkenerTeleport(newPos));
+        congrats.text = string.Empty;
+        SetAngerObstacles(-1);
+        BeginTransition(tutorialDestination, tutorialRoot);
+        gm.Playing();
+        ShowStartButtonLabel();
+        gm.DoneTutorial(2);
+        am.playTutorial(2);
+        ShowTutorialTimerLabel();
+        logger.Log("Started labyrinth tutorial");
+    }
+
+    // Buttons use level numbers 1, 2, 3; only this method converts to indices.
+    // Both level-1 buttons call here, so retries and tutorial skips use the
+    // same duration, destination and anger setup as a completed tutorial.
+    public void BeginLevel(int levelNumber)
+    {
+        if (!CanInteract || levelNumber < 1 || levelNumber > levels.Length) return;
+        if (levelNumber == 1)
+        {
+            if (started || (inLabyrinth && level != 0) || !gm.BeginAttempt(2, false)) return;
+            gm.MarkAttemptGameplay(2);
+        }
+        else if (!inLabyrinth || !started || levelNumber != level + 1) return;
+
+        LevelSettings settings = levels[levelNumber - 1];
+        level = levelNumber;
+        inLabyrinth = true;
+        started = true;
+        time_left = settings.duration;
+        congrats.text = string.Empty;
+        // These obstacles already exist in the scene: nothing is instantiated.
+        // Configure them BEFORE activating the destination labyrinth root.
+        SetAngerObstacles(levelNumber - 1);
+        BeginTransition(settings.destination, settings.labyrinthRoot);
+        UpdateTimerText();
+        if (levelNumber == 1)
+        {
+            gm.Playing();
+            am.clock.Play();
+            gm.StartInsult();
+        }
+        logger.Log("Started labyrinth level " + levelNumber);
+    }
+
+    public void ReturnFromTutorial()
+    {
+        if (!CanInteract || !inLabyrinth || started || level != 0) return;
+        ReturnToTheatre();
+        gm.stoppedPlaying();
+    }
+
+    public void FinishMinigame()
+    {
+        if (!CanInteract || !inLabyrinth || !started || level != levels.Length) return;
+        congrats.text = textAdapter.Get(TextId.Victory);
+        ReturnToTheatre();
         gm.GameWon(2);
         gm.stoppedPlaying();
     }
 
-    IEnumerator DarkenerTeleport(Transform pos)
+    private void ReturnToTheatre()
     {
-        am.playElevator();
+        started = false;
+        inLabyrinth = false;
+        level = 0;
+        TMPTimer.text = string.Empty;
+        SetAngerObstacles(-1);
+        BeginTransition(newPos, null);
+    }
+
+    private void BeginTransition(Transform destination, GameObject destinationRoot)
+    {
+        // Set the guard before a second button event can arrive.
+        transitioning = true;
         blacked.SetActive(true);
-        yield return new WaitForSeconds(3f); // wait 3 seconds
-        player.transform.position = new Vector3 (pos.transform.position.x, player.transform.position.y, pos.transform.position.z);
-        //player.transform.SetPositionAndRotation(new Vector3 (newPos.transform.position.x, player.transform.position.y, newPos.transform.position.z), pos.transform.rotation);
+        if (destinationRoot != null) destinationRoot.SetActive(true);
+        am.playElevator();
+        StartCoroutine(TeleportAfterBlackout(destination, destinationRoot));
+    }
+
+    private IEnumerator TeleportAfterBlackout(Transform destination, GameObject destinationRoot)
+    {
+        // Preserve existing timing: the countdown includes these three seconds.
+        // The configured durations are not adjusted by this method.
+        yield return new WaitForSeconds(3f);
+        PlatformTeleport.TryTeleport(player, destination);
+        // Keep the previous floor present until the player has left it.
+        ShowOnlyLabyrinth(destinationRoot);
         blacked.SetActive(false);
-    }   
-
-    public void SpawnAngerObstacles(int i)
-    {
-        if (angerVar)
-        {
-        angerObstacles[i].SetActive(true);
-        }
-        else
-        {
-        angerObstacles[i].SetActive(false);
-        }
-    }
-    
-    public void setLevel(int i)
-    {
-        level = i;
+        transitioning = false;
     }
 
-    public void setTimer(float time)
+    private void SetAngerObstacles(int activeIndex)
     {
-        puzzleTimer = time;
+        for (int i = 0; i < levels.Length; i++)
+            levels[i].angerObstacles.SetActive(angerVar && i == activeIndex);
     }
-    // Update is called once per frame
+
+    private void ShowOnlyLabyrinth(GameObject activeRoot)
+    {
+        tutorialRoot.SetActive(tutorialRoot == activeRoot);
+        foreach (LevelSettings settings in levels)
+            settings.labyrinthRoot.SetActive(settings.labyrinthRoot == activeRoot);
+    }
+
+    private void UpdateTimerText()
+    {
+        float remaining = Mathf.Max(0f, time_left);
+        TMPTimer.text = textAdapter.Format(TextId.LabyrinthStatus, level,
+            Mathf.FloorToInt(remaining / 60), Mathf.FloorToInt(remaining % 60));
+    }
+
     void Update()
     {
-        {
-        if (started) 
-        {
+        if (gm.AcquisitionBlocked || gm.SessionEnding || !started) return;
         time_left -= Time.deltaTime;
-        int minutes = Mathf.FloorToInt(time_left / 60);
-        int seconds = Mathf.FloorToInt(time_left % 60);
-        // Wording and number placement belong to the translation; gameplay
-        // supplies only the level, minutes and seconds, in this argument order.
-        TMPTimer.text = textAdapter.Format(TextId.LabyrinthStatus, level, minutes, seconds);
-        if (time_left <= 0)
-            {
-                StartCoroutine(DarkenerTeleport(newPos));
-                started = false;
-                TMPTimer.text = string.Empty;
-                puzzleTimer = 93;
-                am.playBad(2);
-                // The same adapter localizes remaining attempts, game disabled
-                // and the updated points label inside GamesManager.
-                gm.addTries(2, congrats, textAdapter);
-            }
-        }
-    }
+        UpdateTimerText();
+        if (time_left > 0) return;
+        StopAllCoroutines();
+        ReturnToTheatre();
+        am.playBad(2);
+        gm.addTries(2, congrats, textAdapter);
     }
 
-
+    public void CancelForAcquisitionLoss()
+    {
+        if (!inLabyrinth && !started && !transitioning && !blacked.activeSelf) return;
+        StopAllCoroutines();
+        started = false;
+        inLabyrinth = false;
+        transitioning = false;
+        PlatformTeleport.TryTeleport(player, newPos);
+        blacked.SetActive(false);
+        SetAngerObstacles(-1);
+        ShowOnlyLabyrinth(null);
+        level = 0;
+        time_left = initialPuzzleTimer;
+        TMPTimer.text = congrats.text = string.Empty;
+    }
 }

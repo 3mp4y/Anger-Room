@@ -49,6 +49,7 @@ public class Card_Minigame : MonoBehaviour
     [SerializeField] private AudioClip levelUpSound;
 
     [Header("Display")]
+    [SerializeField] private TMP_Text startButtonText;
     [FormerlySerializedAs("timer_txt")]
     [SerializeField] private TextMeshPro timerText;
     [FormerlySerializedAs("round_txt")]
@@ -69,6 +70,7 @@ public class Card_Minigame : MonoBehaviour
     private bool[] cardFacesUp = new bool[CardCount];
     private float timeReduction;
     private CardGameState state = CardGameState.Idle;
+    public bool IsTutorialActive => state == CardGameState.Tutorial;
 
     private readonly bool[][] solvableConfigurations =
     {
@@ -88,12 +90,14 @@ public class Card_Minigame : MonoBehaviour
 
     private void Start()
     {
+        startButtonText.text = textAdapter.Get(TextId.TutorialLabel);
         ClearDisplay();
         timeReduction = 0f;
     }
 
     private void Update()
     {
+        if (gamesManager.AcquisitionBlocked) return;
         if (state != CardGameState.Playing)
         {
             return;
@@ -140,11 +144,29 @@ public class Card_Minigame : MonoBehaviour
         SetCardsActive(false);
     }
 
+    public void ShowStartButtonLabel() => startButtonText.text = textAdapter.Get(TextId.StartLabel);
+
+    public void ShowDebugResult(bool won)
+    {
+        ClearCards();
+        timerText.text = textAdapter.Get(won ? TextId.Victory : TextId.GameDisabled);
+    }
+
     private void ClearDisplay()
     {
         levelText.text = string.Empty;
         roundText.text = string.Empty;
         timerText.text = string.Empty;
+    }
+
+    public void CancelForAcquisitionLoss()
+    {
+        if (state == CardGameState.Idle) return;
+        ClearCards();
+        timeReduction = 0f;
+        timeRemaining = roundDurationSeconds;
+        inputFailureChance = InitialFailureChance;
+        cardAudioSource.Stop();
     }
 
     private void SetCardsActive(bool active)
@@ -158,6 +180,8 @@ public class Card_Minigame : MonoBehaviour
     // Public methods are entry points for the buttons wired in the Unity Inspector.
     public void StartMinigame()
     {
+        if (!gamesManager.BeginAttempt(GameIndex, false)) return;
+        timeReduction = 0f;
         inputFailureChance = InitialFailureChance;
         ClearCards();
         levelText.text = textAdapter.Format(TextId.LevelProgress, currentLevel, LevelCount);
@@ -169,6 +193,7 @@ public class Card_Minigame : MonoBehaviour
 
     public void StartTutorial()
     {
+        if (!gamesManager.BeginAttempt(GameIndex, true)) return;
         ClearCards();
         state = CardGameState.Tutorial;
         audioManager.playTutorial(GameIndex);
@@ -220,6 +245,7 @@ public class Card_Minigame : MonoBehaviour
 
     private void TryFlipCards(int first, int second, int third, string buttonName)
     {
+        if (gamesManager.AcquisitionBlocked) return;
         if (state == CardGameState.Idle)
         {
             return;

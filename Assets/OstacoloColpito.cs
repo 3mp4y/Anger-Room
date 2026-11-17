@@ -25,12 +25,12 @@ public class OstacoloColpito : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
+        if (AngerRoom.Shimmer.AcquisitionGate.GameplayBlocked) return;
         // Se la sfera colpisce l'oggetto con il tag player:
         if (other.CompareTag("Player"))
         {
             Debug.Log("Ostacolo colpito, torna all'inizio del labirinto!");
-            Giocatore.transform.position = InizioLabirinto.position;
-            Giocatore.transform.rotation = InizioLabirinto.rotation;
+            PlatformTeleport.TryTeleport(Giocatore, InizioLabirinto);
             am.playBad(2);
             //calcolo le distanze tra il giocatore e gli inizi dei 3 labirinti per capire velocemente in che labirinto siamo
             /*

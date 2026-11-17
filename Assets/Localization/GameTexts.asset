@@ -13,6 +13,10 @@ MonoBehaviour:
   m_Name: GameTexts
   m_EditorClassIdentifier: 
   entries:
+  - id: 11
+    english: Press the blue button to start
+    italian: Premi il pulsante blu per iniziare
+    spanish: Pulsa el botón azul para empezar
   - id: 10
     english: You won!
     italian: Hai vinto!
@@ -103,6 +107,10 @@ MonoBehaviour:
     english: 'Level {0}'
     italian: 'Livello {0}'
     spanish: 'Nivel {0}'
+  - id: 36
+    english: "Get ready...\n{0:00}"
+    italian: "Preparati...\n{0:00}"
+    spanish: "Prep\xE1rate...\n{0:00}"
   - id: 40
     english: 'You failed :(
 
@@ -143,3 +151,59 @@ MonoBehaviour:
     english: Labyrinth
     italian: Labirinto
     spanish: Laberinto
+  - id: 70
+    english: Rules
+    italian: Regole
+    spanish: Reglas
+  - id: 71
+    english: Next
+    italian: Avanti
+    spanish: Siguiente
+  - id: 72
+    english: Shoot 10 targets to pass the level!
+    italian: Colpisci 10 bersagli per superare il livello!
+    spanish: "\xA1Acierta a 10 blancos para pasar de nivel!"
+  - id: 73
+    english: Only the tutorial has a smoke trail to help you.
+    italian: "La scia di fumo \xE8 visibile solo nel tutorial."
+    spanish: Solo en el tutorial hay una estela de humo.
+  - id: 74
+    english: Find the green button to pass the level!
+    italian: Trova il pulsante verde per avanzare!
+    spanish: "\xA1Busca el bot\xF3n verde para avanzar!"
+  - id: 75
+    english: Obstacles send you back to the start of the level.
+    italian: Gli ostacoli ti riportano all'inizio del livello.
+    spanish: "Los obst\xE1culos te devuelven al inicio del nivel."
+  - id: 76
+    english: Each button flips 3 cards.
+    italian: Ogni pulsante gira 3 carte.
+    spanish: "Cada bot\xF3n voltea 3 cartas."
+  - id: 77
+    english: Turn all the cards face up to pass the round!
+    italian: Gira tutte le carte a faccia in su per superare il turno!
+    spanish: "\xA1Pon todas las cartas boca arriba para pasar la ronda!"
+  - id: 78
+    english: 'Labyrinth
+
+      Escape'
+    italian: 'Fuga dal
+
+      labirinto'
+    spanish: 'Escapa del
+
+      laberinto'
+  - id: 79
+    english: 'Target
+
+      Shooter'
+    italian: 'Tiro al
+
+      bersaglio'
+    spanish: 'Tiro al
+
+      blanco'
+  - id: 80
+    english: Subtitle
+    italian: Sottotitolo
+    spanish: "Subt\xEDtulo"

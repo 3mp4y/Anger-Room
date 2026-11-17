@@ -1,0 +1,129 @@
+using System;
+using System.Collections;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using AngerRoom.Localization;
+using TMPro;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+
+public static class LocalizationCompletionSetup
+{
+    const string ScenePath = "Assets/Plugins/Scenes/AngerRoom.unity";
+    const BindingFlags Flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+    static object Get(object o, string n) => o.GetType().GetField(n, Flags).GetValue(o);
+    static void Set(object o, string n, object v) => o.GetType().GetField(n, Flags).SetValue(o, v);
+    static object Call(object o, string n, params object[] args) => o.GetType().GetMethod(n, Flags).Invoke(o, args);
+    static T Find<T>() where T : Component => UnityEngine.Object.FindObjectsOfType<T>(true).Single();
+    static int checks;
+    static void Check(bool ok, string message) { if (!ok) throw new Exception(message); checks++; }
+    static void Assign(UnityEngine.Object o, string n, UnityEngine.Object v)
+    {
+        var so = new SerializedObject(o); so.FindProperty(n).objectReferenceValue = v; so.ApplyModifiedPropertiesWithoutUndo();
+    }
+    public static void ConfigureAndValidate()
+    {
+        if (!Application.isBatchMode) throw new Exception("Batch only");
+        var scene = EditorSceneManager.OpenScene(ScenePath);
+        var texts = UnityEngine.Object.FindObjectsOfType<TMP_Text>(true);
+        var adapter = Find<TextAdapter>();
+        Assign(adapter, "openingPrompt", texts.Single(t => t.name == "Pre-Game-TMP"));
+        Assign(Find<ScoreboardManager>(), "textAdapter", adapter);
+        var cardsLabel = texts.Single(t => t.name == "Cards Tutorial Text (TMP)");
+        var gunLabel = texts.Single(t => t.name == "Gun Tutorial Text (TMP) (1)");
+        Assign(Find<Card_Minigame>(), "startButtonText", cardsLabel);
+        Assign(Find<GunPuzzle>(), "startButtonText", gunLabel);
+        // Remove only the obsolete direct string setters. DoneTutorial now owns
+        // this transition for both physical buttons and debug tutorial skips.
+        foreach (var wrapper in UnityEngine.Object.FindObjectsOfType<Oculus.Interaction.InteractableUnityEventWrapper>(true))
+        {
+            var so = new SerializedObject(wrapper);
+            var calls = so.FindProperty("_whenUnselect.m_PersistentCalls.m_Calls");
+            if (calls == null) continue;
+            for (int i = calls.arraySize - 1; i >= 0; i--)
+            {
+                var entry = calls.GetArrayElementAtIndex(i);
+                var target = entry.FindPropertyRelative("m_Target").objectReferenceValue;
+                if ((target == cardsLabel || target == gunLabel) && entry.FindPropertyRelative("m_MethodName").stringValue == "set_text")
+                    calls.DeleteArrayElementAtIndex(i);
+            }
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+        EditorSceneManager.MarkSceneDirty(scene); EditorSceneManager.SaveScene(scene);
+        Validate();
+    }
+
+    static GamesManager Load(LanguageAdapter.Language language)
+    {
+        EditorSceneManager.OpenScene(ScenePath);
+        Find<LanguageAdapter>().currentLanguage = language;
+        Call(Find<TextAdapter>(), "Awake");
+        var gm = Find<GamesManager>();
+        foreach (var t in Find<GunPuzzle>().GetComponentsInParent<Transform>(true)) t.gameObject.SetActive(true);
+        Call(gm, "Awake"); Call(gm, "Start");
+        Directory.CreateDirectory("Logs/LocalizationCompletion");
+        Set(gm.GetComponent<Logger>(), "_logPath", "Logs/LocalizationCompletion/events.txt");
+        Call(gm.GetComponent<ScoreboardManager>(), "Start");
+        Call(gm.am, "Awake"); Call(gm.am, "Start");
+        Call(Find<Card_Minigame>(), "Start"); Call(Find<GunPuzzle>(), "Start");
+        gm.SetAcquisitionBlocked(false);
+        return gm;
+    }
+
+    public static void Validate()
+    {
+        checks = 0;
+        foreach (LanguageAdapter.Language language in Enum.GetValues(typeof(LanguageAdapter.Language)))
+        {
+            var gm = Load(language); var adapter = Find<TextAdapter>();
+            Check(((TMP_Text)Get(adapter, "openingPrompt")).text == adapter.Get(TextId.OpeningPrompt), "Opening prompt not translated");
+            string first = adapter.Format(TextId.ScoreboardEntry, 4, 300, 1);
+            Check(Find<ScoreboardManager>().ScoreboardText.StartsWith(first), "Scoreboard startup not translated");
+            Find<ScoreboardManager>().AddPlayerPoints(100);
+            Check(Find<ScoreboardManager>().ScoreboardText.Contains(adapter.Format(TextId.ScoreboardEntry, 21, 100, 16)), "Updated scoreboard not translated/ranked");
+            Check(((TMP_Text)Get(Find<Card_Minigame>(), "startButtonText")).text == adapter.Get(TextId.TutorialLabel), "Cards initial label wrong");
+            gm.DoneTutorial(0); gm.DoneTutorial(1);
+            Check(((TMP_Text)Get(Find<Card_Minigame>(), "startButtonText")).text == adapter.Get(TextId.StartLabel), "Cards start label wrong");
+            Check(((TMP_Text)Get(Find<GunPuzzle>(), "startButtonText")).text == adapter.Get(TextId.StartLabel), "Shooting start label wrong");
+
+            var gun = Find<GunPuzzle>();
+            gun.StartGun(); Set(gun, "level", 3); Set(gun, "hits", 9); Set(gun, "started", true);
+            ((IEnumerator)Call(gun, "CoroutineHit")).MoveNext(); Call(gun, "LateUpdate");
+            CheckResult(gun, adapter.Get(TextId.Victory));
+            Check(!gun.realgun.activeSelf && !(bool)Get(gun.Spawner, "started") && !(bool)Get(gun, "readoutsActive"), "Result restarted shooting");
+            Call(gun, "LateUpdate"); CheckResult(gun, adapter.Get(TextId.Victory));
+            gun.CancelForAcquisitionLoss(); Call(gun, "LateUpdate");
+            Check(!((GameObject)Get(Get(gun, "screenReadout"), "root")).activeSelf, "Canceled result stayed visible");
+
+            foreach (bool finalFailure in new[] { false, true })
+            {
+                gm = Load(language); gun = Find<GunPuzzle>(); adapter = Find<TextAdapter>();
+                if (finalFailure) { ((int[])Get(gm, "gameTries"))[1] = 2; ((int[])Get(gm, "gamePoints"))[1] = 40; }
+                gun.StartGun(); Set(gun, "time_left", 0f); Call(gun, "Update");
+                // Edit-mode coroutines do not tick: advance the real message
+                // iterator explicitly, including its four-second wait boundary.
+                var timer = (TextMeshPro)Get(gun, "TMPTimer");
+                var message = (IEnumerator)Call(gm, "lossMessage", finalFailure ? 3 : 1, finalFailure, timer, adapter);
+                bool waiting = message.MoveNext(); Call(gun, "LateUpdate");
+                CheckResult(gun, finalFailure ? adapter.Get(TextId.GameDisabled) : adapter.Format(TextId.AttemptFailed, 2));
+                Check(waiting != finalFailure, "Wrong result lifetime");
+                if (!finalFailure)
+                {
+                    Check(message.Current is WaitForSeconds, "Retry message has no delay");
+                    message.MoveNext(); Call(gun, "LateUpdate");
+                    Check(!((GameObject)Get(Get(gun, "screenReadout"), "root")).activeSelf, "Retry message did not disappear");
+                }
+            }
+        }
+        File.WriteAllText("Logs/LocalizationCompletion/result.txt", "PASS " + checks + " checks across all three languages. Scene was not saved during tests.");
+        Debug.Log("LOCALIZATION_COMPLETION_PASS " + checks);
+    }
+    static void CheckResult(GunPuzzle gun, string expected)
+    {
+        var readout = Get(gun, "screenReadout");
+        Check(((GameObject)Get(readout, "root")).activeSelf && ((TMP_Text)Get(readout, "timerLabel")).text == expected, "Result is hidden or untranslated");
+        Check(((TMP_Text)Get(readout, "levelLabel")).text == "" && ((TMP_Text)Get(readout, "hitsLabel")).text == "", "Result left stale progress labels");
+    }
+}
