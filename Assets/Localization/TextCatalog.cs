@@ -92,7 +92,7 @@ namespace AngerRoom.Localization
             new Entry(TextId.TutorialLabel,
                 "Tutorial", "Tutorial", "Tutorial"),
             new Entry(TextId.StartLabel,
-                "Start", "Inizia", "Empezar"),
+                "Start", "Start", "Start"),
             new Entry(TextId.LevelProgress,
                 "Level\n{0}/{1}", "Livello\n{0}/{1}", "Nivel\n{0}/{1}"),
             new Entry(TextId.RoundProgress,

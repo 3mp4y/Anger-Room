@@ -23,7 +23,7 @@ public class AudioManager : MonoBehaviour
     private List<AudioClip> tutorials;
     private List<AudioClip> host_time_insults;
     private List<AudioClip> host_error_insults;
-    private List<AudioClip> host_loss;
+    private AudioClip host_loss;
     private AudioClip completionClip;
     private AudioClip timeoutClip;
     private bool endingStarted;
@@ -157,7 +157,7 @@ private IEnumerator PlayFirstAudioDialog(GameObject UI)
                 yield return null;
             }
         UI_button.SetActive(true);
-        if (tutorial_index == host_intros.Count-1); {
+        if (tutorial_index == host_intros.Count-1) {
         logger.Log("Introduction Over");
         //gm.StartOverAllTimer();
         }
@@ -218,7 +218,7 @@ private IEnumerator PlayFirstAudioDialog(GameObject UI)
 
     public void playLoss()
     {
-        StartEnding(host_loss != null && host_loss.Count > 0 ? host_loss[0] : null);
+        StartEnding(host_loss != null ? host_loss : null);
     }
 
     public void PlayTimeout()

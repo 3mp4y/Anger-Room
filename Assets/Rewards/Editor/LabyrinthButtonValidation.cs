@@ -62,20 +62,31 @@ public static class LabyrinthButtonValidation
         var numbers = new System.Collections.Generic.List<int>();
         foreach (var c in l.GetComponentsInChildren<MonoBehaviour>(true).Where(c => c != null))
         {
+            // Archived maze versions are retained for editing, excluded from builds.
+            if (c.GetComponentsInParent<Transform>(true).Any(t => t.CompareTag("EditorOnly"))) continue;
             var so = new SerializedObject(c);
             var calls = so.FindProperty("_whenUnselect.m_PersistentCalls.m_Calls");
             if (calls == null || calls.arraySize == 0) continue;
-            var call = calls.GetArrayElementAtIndex(0);
-            if (call.FindPropertyRelative("m_Target").objectReferenceValue != l) continue;
-            Check(calls.arraySize == 1, "Button has multiple gameplay calls: " + c.name);
-            Check(so.FindProperty("_whenSelect.m_PersistentCalls.m_Calls").arraySize == 0, "Press event still changes gameplay");
+            // Audio/visual feedback may share these events. Validate gameplay
+            // callbacks regardless of their position in the Inspector list.
+            var gameplayCalls = Enumerable.Range(0, calls.arraySize)
+                .Select(calls.GetArrayElementAtIndex)
+                .Where(p => p.FindPropertyRelative("m_Target").objectReferenceValue == l).ToArray();
+            if (gameplayCalls.Length == 0) continue;
+            Check(gameplayCalls.Length == 1, "Button has multiple gameplay calls: " + c.name);
+            var call = gameplayCalls[0];
+            var pressCalls = so.FindProperty("_whenSelect.m_PersistentCalls.m_Calls");
+            Check(Enumerable.Range(0, pressCalls.arraySize).All(i =>
+                pressCalls.GetArrayElementAtIndex(i).FindPropertyRelative("m_Target").objectReferenceValue != l),
+                "Press event still changes gameplay");
             string method = call.FindPropertyRelative("m_MethodName").stringValue;
             Check(typeof(LabyrinthScript).GetMethod(method) != null, "Missing method " + method);
             Check(call.FindPropertyRelative("m_CallState").intValue == 2, "Button event disabled");
             found.Add(method);
+            Debug.Log("LABYRINTH_BUTTON " + c.name + " -> " + method);
             if (method == "BeginLevel") numbers.Add(call.FindPropertyRelative("m_Arguments.m_IntArgument").intValue);
         }
-        Check(found.OrderBy(x => x).SequenceEqual(expected.OrderBy(x => x)), "Wrong set of seven button actions");
+        Check(found.OrderBy(x => x).SequenceEqual(expected.OrderBy(x => x)), "Wrong set of seven button actions: " + string.Join(", ", found));
         Check(numbers.OrderBy(x => x).SequenceEqual(new[] { 1, 1, 2, 3 }), "Wrong level button arguments");
         Check(Levels(l).Length == 3 && Levels(l).All(x => (float)Get(x, "duration") >= 3f), "Expected three configured level durations");
         foreach (var entry in Levels(l))

@@ -35,9 +35,9 @@ public class LanguageAdapter : MonoBehaviour
     [SerializeField] private List<AudioClip> host_error_insults_ENG;
 
     [Header("Ending: All Minigames Lost (after reward collection)")]
-    [SerializeField] private List<AudioClip> host_loss_ITA;
-    [SerializeField] private List<AudioClip> host_loss_ES;
-    [SerializeField] private List<AudioClip> host_loss_ENG;
+    [SerializeField] private AudioClip host_loss_ITA;
+    [SerializeField] private AudioClip host_loss_ES;
+    [SerializeField] private AudioClip host_loss_ENG;
 
     [Header("Ending: Time Ran Out")]
     [SerializeField] private AudioClip hostTimeoutItalian;
@@ -45,11 +45,8 @@ public class LanguageAdapter : MonoBehaviour
     [SerializeField] private AudioClip hostTimeoutEnglish;
 
     [Header("Ending: Some Or All Minigames Won (after reward collection)")]
-    [UnityEngine.Serialization.FormerlySerializedAs("hostMixedResultsItalian")]
     [SerializeField] private AudioClip hostCompletionItalian;
-    [UnityEngine.Serialization.FormerlySerializedAs("hostMixedResultsSpanish")]
     [SerializeField] private AudioClip hostCompletionSpanish;
-    [UnityEngine.Serialization.FormerlySerializedAs("hostMixedResultsEnglish")]
     [SerializeField] private AudioClip hostCompletionEnglish;
 
     public AudioClip HostTimeout => currentLanguage switch
@@ -64,6 +61,13 @@ public class LanguageAdapter : MonoBehaviour
         Language.Italian => hostCompletionItalian,
         Language.Spanish => hostCompletionSpanish,
         _ => hostCompletionEnglish
+    };
+
+    public AudioClip HostLoss => currentLanguage switch
+    {
+        Language.Italian => host_loss_ITA,
+        Language.Spanish => host_loss_ES,
+        _ => host_loss_ENG
     };
 
     [Header("Audience Generic Insults")]
@@ -137,9 +141,6 @@ public class LanguageAdapter : MonoBehaviour
 
     public List<AudioClip> HostErrorInsults 
         => GetLocalizedList(host_error_insults_ITA, host_error_insults_ES, host_error_insults_ENG);
-
-    public List<AudioClip> HostLoss 
-        => GetLocalizedList(host_loss_ITA, host_loss_ES, host_loss_ENG);
 
     public List<AudioClip> AudienceGenericInsults 
         => GetLocalizedList(audience_generci_insults_ITA, audience_generci_insults_ES, audience_generci_insults_ENG);

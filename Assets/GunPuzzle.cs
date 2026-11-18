@@ -64,6 +64,31 @@ public class GunPuzzle : MonoBehaviour
     [Header("Preparation")]
     [Tooltip("Seconds to get ready before targets and the first round timer start.")]
     [SerializeField, Min(0f)] private float preparationSeconds = 3f;
+    [Header("Target movement per level")]
+    [Tooltip("Applied when a level starts. Change outside Play Mode to keep your settings.")]
+    [SerializeField] private TargetMovementSettings level1Movement = new TargetMovementSettings(0.2f, 0.6f, 2f);
+    [SerializeField] private TargetMovementSettings level2Movement = new TargetMovementSettings(0.6f, 1.5f, 0.8f);
+    [SerializeField] private TargetMovementSettings level3Movement = new TargetMovementSettings(1f, 2.4f, 0.32f);
+
+    // Serializable makes these ordinary C# objects expandable in the Inspector.
+    // Named fields keep exactly three levels, with no array size to configure.
+    [System.Serializable]
+    private sealed class TargetMovementSettings
+    {
+        [Tooltip("Minimum target speed in Unity units per second.")]
+        [Min(0f)] public float minimumSpeed;
+        [Tooltip("Maximum target speed. Values below the minimum are treated as the minimum.")]
+        [Min(0f)] public float maximumSpeed;
+        [Tooltip("Seconds between random speed choices. Lower values change speed more often, not direction.")]
+        [Min(0.01f)] public float speedChangeInterval;
+
+        public TargetMovementSettings(float minimum, float maximum, float interval)
+        {
+            minimumSpeed = minimum;
+            maximumSpeed = maximum;
+            speedChangeInterval = interval;
+        }
+    }
     [SerializeField] private int hits;
     private int level;
     public GamesManager gm;
@@ -209,16 +234,15 @@ public class GunPuzzle : MonoBehaviour
         // 3. Spawn2 applies them to each NEW target's TargetMover component.
         // We never modify the TargetMover on the prefab asset itself.
         //
-        // Calculate from the level number, not from a previous target's values.
-        // This makes a retry start at level-one speeds even after a tutorial
-        // or a previous attempt reached level three. The original progression is:
-        // Level 1: 0.2-0.6 units/sec, new speed every 2 seconds.
-        // Level 2: 0.6-1.5 units/sec, new speed every 0.8 seconds.
-        // Level 3: 1.0-2.4 units/sec, new speed every 0.32 seconds.
-        int completedLevels = level - 1;
-        float minimumSpeed = 0.2f + completedLevels * 0.4f;
-        float maximumSpeed = 0.6f + completedLevels * 0.9f;
-        float speedChangeInterval = 2f * Mathf.Pow(0.4f, completedLevels);
+        // Read this level's Inspector settings afresh on every entry/retry.
+        // Tutorial movement is configured separately and remains stationary.
+        // These are snapshots: editing during an active round takes effect the
+        // next time that level starts, not on targets already moving.
+        TargetMovementSettings settings = level == 1 ? level1Movement
+            : level == 2 ? level2Movement : level3Movement;
+        float minimumSpeed = Mathf.Max(0f, settings.minimumSpeed);
+        float maximumSpeed = Mathf.Max(minimumSpeed, settings.maximumSpeed);
+        float speedChangeInterval = Mathf.Max(0.01f, settings.speedChangeInterval);
 
         // Configure BEFORE StartSpawning. Existing targets keep their own values;
         // the level transition already clears them before starting the next level.

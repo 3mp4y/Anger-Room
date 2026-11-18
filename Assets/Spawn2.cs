@@ -38,7 +38,7 @@ public class Spawn2 : MonoBehaviour
         for (int i = 0; i< targetRows; i++)
         {
             _possibleSpawPos.Add(transform.position.y + increment);
-            increment += 1f;
+            increment += 0.7f;
         }
         started = false;
     }

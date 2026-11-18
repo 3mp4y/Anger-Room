@@ -110,7 +110,7 @@ public class LabyrinthScript : MonoBehaviour
         {
             gm.Playing();
             am.clock.Play();
-            gm.StartInsult();
+            gm.StartInsult(19f);
         }
         logger.Log("Started labyrinth level " + levelNumber);
     }

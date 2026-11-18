@@ -6,7 +6,7 @@ public class LaserSparatoLabirinto : MonoBehaviour
     [SerializeField] Logger logger;
     public Transform OrigineLaser;
     public float maxLineDistance = 20;
-    [Tooltip("Layers identifying player colliders. All layers can block the laser.")]
+    [Tooltip("Layers identifying player colliders. Lasers stop only at these colliders or a LabyrinthLaserWall.")]
     public LayerMask Player;
     public GameObject Giocatore;
     public Transform InizioLabirinto;
@@ -17,6 +17,34 @@ public class LaserSparatoLabirinto : MonoBehaviour
     [SerializeField] float _lineStartingWidth;
 
     AudioSource thisAudio;
+    private RaycastHit[] hitBuffer = new RaycastHit[16];
+
+    // Raycasts can report a sphere before the wall/player behind it. Inspect
+    // all hits and choose the nearest VALID blocker; a separate player-only
+    // ray would incorrectly detect participants through walls.
+    public bool TryGetBlockingHit(Ray ray, out RaycastHit blockingHit)
+    {
+        int count;
+        // NonAlloc results are not sorted, and a full buffer can omit a closer
+        // wall. Grow and repeat until every hit fits. Subsequent shots reuse it.
+        while ((count = Physics.RaycastNonAlloc(ray, hitBuffer, maxLineDistance,
+            Physics.AllLayers, QueryTriggerInteraction.Collide)) == hitBuffer.Length)
+            System.Array.Resize(ref hitBuffer, hitBuffer.Length * 2);
+
+        blockingHit = default;
+        float nearest = float.PositiveInfinity;
+        for (int i = 0; i < count; i++)
+        {
+            Collider collider = hitBuffer[i].collider;
+            bool isPlayer = (Player.value & (1 << collider.gameObject.layer)) != 0;
+            var wall = collider.GetComponentInParent<LabyrinthLaserWall>();
+            if (!isPlayer && (wall == null || !wall.enabled)) continue;
+            if (hitBuffer[i].distance >= nearest) continue;
+            blockingHit = hitBuffer[i];
+            nearest = blockingHit.distance;
+        }
+        return nearest < float.PositiveInfinity;
+    }
     // Start is called before the first frame update
     void Start()
     {
@@ -41,10 +69,9 @@ public class LaserSparatoLabirinto : MonoBehaviour
         if (AngerRoom.Shimmer.AcquisitionGate.GameplayBlocked) return;
         thisAudio.Play();
         Ray ray = new Ray(OrigineLaser.position, OrigineLaser.forward);
-        // One raycast supplies both the visible endpoint and the gameplay hit.
-        // All layers can block the beam; triggers follow the project physics setting.
-        // A separate player-only ray would ignore walls and could hit through them.
-        bool hasHitAny = Physics.Raycast(ray, out RaycastHit hitAny, maxLineDistance, Physics.AllLayers);
+        // Sphere obstacles still collide with the participant, but are not
+        // laser blockers. The selected hit drives BOTH the beam and the reset.
+        bool hasHitAny = TryGetBlockingHit(ray, out RaycastHit hitAny);
         Vector3 endPoint = ray.GetPoint(maxLineDistance);
         if (hasHitAny)
         {

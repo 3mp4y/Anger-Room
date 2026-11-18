@@ -17,6 +17,7 @@ public class GamesManager : MonoBehaviour
     [SerializeField] private GameObject rightTeleportInteractor;
     [Tooltip("The controller-mounted labyrinth readout; moved once at session startup.")]
     [SerializeField] private Transform controllerReadout;
+    private Vector3 leftReadoutPosition = new Vector3(0.16f, -0.13f, -0.093f);
     [SerializeField] private Transform leftControllerModel;
     [SerializeField] private Transform rightControllerModel;
     private bool handChoiceInitialized;
@@ -46,9 +47,7 @@ public class GamesManager : MonoBehaviour
             controllerReadout.SetParent(ActiveControllerModel, false);
             if (IsLeftHanded)
             {
-                Vector3 position = controllerReadout.localPosition;
-                position.x = -position.x;
-                controllerReadout.localPosition = position;
+                controllerReadout.localPosition = leftReadoutPosition;
             }
         }
     }
@@ -229,9 +228,9 @@ public class GamesManager : MonoBehaviour
     [SerializeField] TextMeshPro TMPtime_left_exp;
     [SerializeField] TextMeshPro[] scores = new TextMeshPro[3];
     //[SerializeField] TextMeshPro[] scores2 = new TextMeshPro[3];
-    private int gmTriesGun = 0;
-    private int gmTriesCards = 0;
-    private int gmTriesLab = 0;
+    //private int gmTriesGun = 0;
+    //private int gmTriesCards = 0;
+    //private int gmTriesLab = 0;
     [SerializeField] int[] gameTries = {0,0,0};
     [SerializeField] int[] gamePoints = {100, 100, 100};
     [SerializeField] int[] wins = {0,0,0};
@@ -421,24 +420,27 @@ public class GamesManager : MonoBehaviour
         }
     }
     
-    private IEnumerator validInsults() {
+    private IEnumerator validInsults(float timer) {
         yield return new WaitForSeconds(23f);
         Debug.Log("Inizio Insulti");
         while (true)
         {
-            if (Random.Range(0, 1) == 0)
+            if (Random.value < 0.8f)
             {
             am.play_gen_insult();
-            yield return new WaitForSeconds(33f);
+            yield return new WaitForSeconds(timer);
             }
             Debug.Log("Shucks");
-            yield return new WaitForSeconds(5f);
+            yield return new WaitForSeconds(1.7f);
         }
     }
-    public void StartInsult()
+    public void StartInsult(float timer_per_game)
     {
         if (AcquisitionBlocked || minigamesFinished || SessionEnding) return;
-        audioloop = StartCoroutine(validInsults());
+        // Keep the existing schedule if another event calls this again.
+        // StopLoop clears the reference so the next minigame can start its own.
+        if (audioloop != null) return;
+        audioloop = StartCoroutine(validInsults(timer_per_game));
     }
 
     public void StopLoop()
